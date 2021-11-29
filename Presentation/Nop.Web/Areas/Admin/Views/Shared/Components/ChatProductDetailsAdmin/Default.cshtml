@@ -1,0 +1,151 @@
+﻿@using Nop.Web.Factories
+@using Nop.Web.Models.Quote
+@using Nop.Web.Models.Common
+@inject IQuoteModelFactory _quoteFactory
+
+@model ChatProductDetailsModel
+@{
+    CustomerQuoteListModel customerQuoteListModels = new CustomerQuoteListModel();
+
+    customerQuoteListModels = await _quoteFactory.PrepareCustomerQuoteListModelAsync();
+}
+<div class="container-box">
+
+    <div class="container-title bb pr-3 pl-5 pt-2 pb-2">
+        <div class="row">
+            <span> Search Product</span><br>
+        </div>
+    </div>
+
+    <div class="container-box-area pt-2 pb-2">
+        <div class="container-title bb pr-3 pl-3 pt-2 pb-2">
+            <div class="row">
+                <div class="col-1"></div>
+                <div class="col-7 p-4">
+                    <input type="text" id="productText" class="p-2" style="border-radius:10px 10px 10px 10px; width:100%" placeholder="Search by Product Name or Search by SKU" />
+                </div>
+
+                <div class="col-3 p-4">
+                    <button class="my-success-button" onclick="SearchProductForQuote('@Model.QuoteGuid', '@Model.CustomerFlag');"> Search </button>
+                </div>
+                <div class="col-1"></div>
+            </div>
+        </div>
+        <div class="pt-4 pr-3 pl-3">
+            <table class="table-bordered align-text-center" id="prodTable" style="width:100%">
+                <thead>
+                    <tr>
+                        <th colspan="5" style="font-weight:500" class="align-text-left pl-3">Search Result</th>
+                    </tr>
+                    <tr>
+                        <th width="20%">Product Name</th>
+                        <th width="20%">SKU</th>
+                        <th width="20%">Price</th>
+                        <th width="20%">Vendor</th>
+                        <th width="20%">Chat Vendor</th>
+                    </tr>
+
+                </thead>
+                <tbody>
+                    @*@{
+                            if (customerQuoteListModels != null && customerQuoteListModels.Quotes != null && customerQuoteListModels.Quotes.Count > 0)
+                            {
+                                foreach (var rec in customerQuoteListModels.Quotes)
+                                {
+                                    <tr>
+                                        <td>Prodcut Name 1</td>
+                                        <td>Vendot Name</td>
+                                        <td>V656FDFGH</td>
+                                        <td>$100</td>
+                                        <td>
+                                            <a href=""><i class="fa fa-user-plus"></i></a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+
+                        }*@
+
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row pt-4 pr-3 pl-3 pb-4" style="margin-top:200px;">
+            <div class="col-8"></div>
+            <div class="col-4 align-text-right">
+                <button class="my-close-button" onclick="ProductClose()"> Close</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    function SearchProductForQuote(quoteId, customerFlag) {
+        var productText = $('#productText').val();
+
+        if (productText.length >= 3) {
+            $.ajax({
+                url: '@Url.Action("SearchProductForQuote", "RequestQuoteAdmin")',
+                type: "GET",
+                data: { productName: productText },
+                success: function (response) {
+                    if (response.success) {
+                        var prodName = '<td>' + response.result.ProductName+'</td>';
+                        var sku = '<td>' + response.result.SKU+'</td>';
+                        var price = '<td>' + response.result.Price+'</td>';
+                        var vendName = '<td>' + response.result.VendorName + '</td>';
+                        var chatVend = '<td><a href="javascript:void(0);" onclick="AddProductInQuote(\'' + quoteId + '\',' + response.result.Id + ',' + response.result.VendorId + ',\'' + customerFlag + '\')"><i class="fa fa-user-plus"></i> </a></td>';
+
+                        var rowData = prodName + sku + price + vendName + chatVend;
+                        AddProductInTable(rowData, 'prodTable');
+                    }
+                    else {
+                        displayPopupNotification(response.message, 'error', 3000);
+                    }
+                }
+            });
+        }
+    }
+
+
+    function AddProductInQuote(_quoteId, _productId, _vendorId, customerFlag) {
+        var serverUrl = '@Url.Action("AddProductInVendorQuote", "RequestQuoteAdmin")';
+        if (customerFlag == 'True') {
+            serverUrl = '@Url.Action("AddProductInCustomerQuote", "RequestQuoteAdmin")';
+        }
+        $.ajax({
+            url: serverUrl,
+            type: "GET",
+            data: { quoteGuid: _quoteId, productId: parseInt(_productId), vendorId: parseInt(_vendorId) },
+            success: function (response) {
+                if (response.success) {
+                    $("#prodTable tbody").html('');
+                    ProductClose();
+                    location.reload();
+                    displayPopupNotification(response.message, 'success', 3000);
+                }
+                else {
+                    displayPopupNotification(response.message, 'error', 3000);
+                }
+            }
+        });
+    }
+
+    function AddProductInTable(newRowContent, tableId) {
+        var tblString = "#" + tableId + " tbody";
+        $(tblString).html('');
+        $(tblString).append(newRowContent);
+        $('#productText').val('');
+    }
+
+    $('#productText').on('keypress', function (e) {
+        if (e.which === 13) {
+            SearchProductForQuote('@Model.QuoteGuid', '@Model.CustomerFlag');
+        }
+    });
+
+</script>

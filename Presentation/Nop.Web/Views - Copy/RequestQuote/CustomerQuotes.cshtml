@@ -1,0 +1,50 @@
+﻿@model  Nop.Web.Models.Quote.CustomerQuoteListModel
+@{
+    Layout = "_ColumnsTwo";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-account-page");
+    Html.AppendPageCssClassParts("html-order-list-page");
+}
+@section left
+{
+    @await Component.InvokeAsync("CustomerNavigation", new { selectedTabId = CustomerNavigationEnum.CustomerQuotes })
+}
+<div class="page account-page order-list-page">
+    <div class="page-title">
+        <h1>@T("Account.MyAccount") - @T("Account.CustomerQuotes")</h1>
+    </div>
+    <div class="page-body">
+        
+
+        @if (Model.Quotes.Count > 0)
+        {
+            <div class="order-list">
+                @foreach (var order in Model.Quotes)
+                {
+                    <div class="section order-item">
+                        <div class="title">
+                            <strong>@T("Account.CustomerQuotes.QuoteNumber"): @order.CustomQuoteNumber</strong>
+                        </div>
+                        <ul class="info">
+                            <li>@T("Account.CustomerQuotes.QuoteStatus"): <span class="order-status @order.QuoteStatusEnum.ToString().ToLowerInvariant()">@order.QuoteStatusEnum</span></li>
+                            <li>@T("Account.CustomerQuotes.QuoteDate"): <span class="order-date">@order.CreatedOn.ToString()</span></li>
+                            <li>@T("Account.CustomerQuotes.QuoteTotal"): <span class="order-total">@order.QuoteTotal</span></li>
+                        </ul>
+                        <div class="buttons" style="color:deepskyblue">
+                            <button type="button" class="button-2 order-details-button" style="color:deepskyblue" onclick="setLocation('/Messenger/Index/' + '@order.QuoteGuid')">@T("Account.CustomerQuotes.QuoteDetails")</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="no-data">
+                @T("Account.CustomerQuotes.NoQuotes")
+            </div>
+        }
+    </div>
+</div>

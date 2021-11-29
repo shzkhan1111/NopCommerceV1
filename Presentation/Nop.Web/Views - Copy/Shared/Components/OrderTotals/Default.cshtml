@@ -1,0 +1,25 @@
+﻿@model OrderTotalsModel
+<div class="total-info">
+    <table class="cart-total">
+        <tbody>
+            <tr class="order-subtotal">
+                <td class="cart-total-left">
+                    <label>@T("RequestQuote.Total.TotalProducts"):</label>
+                </td>
+                <td class="cart-total-right">
+                    <span class="value-summary">@Model.TotalProducts</span>
+                </td>
+            </tr>
+
+            <tr class="order-subtotal">
+                <td class="cart-total-left">
+                    <label>@T("RequestQuote.Total.TotalProductsQty"):</label>
+                </td>
+                <td class="cart-total-right">
+                    <span class="value-summary">@Model.TotalProductsQty</span>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>

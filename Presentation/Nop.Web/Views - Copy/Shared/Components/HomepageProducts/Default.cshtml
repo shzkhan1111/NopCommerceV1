@@ -1,0 +1,545 @@
+﻿@model IList<ProductOverviewModel>
+@if (Model.Count > 0)
+{
+    var count = 0;
+    var count1 = 0;
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/bootstrap/js/bootstrap.min.js");
+    Html.AddCssFileParts(ResourceLocation.Footer, "~/lib_npm/bootstrap/css/bootstrap.min.css");
+    Html.AddCssFileParts(ResourceLocation.Footer, "~/lib_npm/@fortawesome/fontawesome-free/css/all.min.css");
+
+    <div class="product-grid home-page-product-grid">
+        <div class="row">
+
+            <!--left slider -->
+            <div id="slider-left" class="col-md-3 carousel slide" data-ride="carousel" data-interval="false">
+                <!-- Indicators -->
+                <div class="col-12">
+                    <div class="title">
+                        @*<strong>Featured</strong>*@
+                        <label>Featured</label>
+                        <a class="carousel-control-prev" href="#slider-left" data-slide="prev">
+                            <span class="fa fa-angle-left" style="color:black"></span>
+                        </a>
+                        <a class="carousel-control-next" href="#slider-left" data-slide="next">
+                            <span class="fa fa-angle-right" style="color:black"></span>
+                        </a>
+                    </div>
+                </div>
+                <!-- The slideshow -->
+                <div class="carousel-inner">
+                    @foreach (var item in Model)
+                    {
+                        if (!item.IsTrending)
+                        {
+
+                            <div class="@(count == 0 ? "carousel-item active" : "carousel-item")">
+                                <div class="item-grid row">
+                                    <div class="item-box col-md-12" style="width:100% !important">
+                                        @await Html.PartialAsync("_ProductBoxHome", item)
+                                    </div>
+                                </div>
+                            </div>
+                            count++;
+                        }
+                    }
+
+                </div>
+
+            </div>
+
+            <!--center left end-->
+            <!--center slider -->
+            <div id="slider" class="col-md-9 carousel slide" data-ride="carousel" data-interval="false">
+                <!-- Indicators -->
+                <div class="col-md-12">
+                    <div class="title">
+                        <label>Trending</label>
+                        <a class="carousel-control-prev" href="#slider" data-slide="prev">
+                            <span class="fa fa-angle-left" style="color:black"></span>
+                        </a>
+                        <a class="carousel-control-next" href="#slider" data-slide="next">
+                            <span class="fa fa-angle-right" style="color:black"></span>
+                        </a>
+                    </div>
+                </div>
+                <!-- The slideshow -->
+                <div class="carousel-inner">
+                    @for (int i = 0; i < Model.Count;)
+                    {
+                        <div class="@(count1 == 0 ? "carousel-item active" : "carousel-item")">
+                            @for (int j = 0; j < 3 && i < Model.Count; j++)
+                            {
+                                <div class="item-grid col-md-4">
+                                    <div class="item-box">
+                                        @await Html.PartialAsync("_ProductBoxHome", Model[i])
+                                    </div>
+                                </div>
+                                i++;
+                            }
+                        </div>
+                        count1++;
+                    }
+
+                </div>
+
+            </div>
+
+            <!--center slider end-->
+        </div>
+    </div>
+}
+
+@*<div class="row">
+        <div class="item-grid col-md-4">
+            <div class="item-box">
+                @await Html.PartialAsync("_ProductBoxHome1", Model[0])
+            </div>
+        </div>
+    </div>*@
+
+<div class="row">
+    <div class='col-md-12'>
+        <ul class="nav nav-pills float-right" id="pills-tab" role="tablist" style="margin-right:3%;">
+            <li class="nav-item">
+                <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home1" role="tab" aria-controls="pills-home" aria-selected="true">NEW PRODUCTS</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="pills-profile-tab1" data-toggle="pill" href="#pills-profile1" role="tab" aria-controls="pills-profile" aria-selected="false">ON SALE</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact1" role="tab" aria-controls="pills-contact" aria-selected="false">BEST SELERS</a>
+            </li>
+        </ul>
+    </div>
+    <div class="col-4 nopadding">
+        <img class="base-img" src="~/images/main.PNG" />
+    </div>
+
+    <div class="col-8">
+        <div class="row">
+
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active row" id="pills-home1" role="tabpanel" aria-labelledby="pills-home-tab" style="margin-right: 0px;margin-left: 0px;">
+                    <div class="row col-md-12">
+                        <div class="item-box col-md-6 left-padding" style="max-height:80%;">
+                            @await Html.PartialAsync("_ProductBoxHome1", Model[0])
+                        </div>
+                        <div class="item-box col-md-6 mgn-left" style="max-height:80%;">
+                            @await Html.PartialAsync("_ProductBoxHome1", Model[1])
+                        </div>
+                    </div>
+                    <!--1 inner div -->
+
+                    <div class="row col-md-12 mgn-top">
+                        <div class="item-box col-md-6 left-padding">
+                            @await Html.PartialAsync("_ProductBoxHome1", Model[2])
+                        </div>
+                        <div class="item-box col-md-6 mgn-left">
+                            @await Html.PartialAsync("_ProductBoxHome1", Model[3])
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="pills-profile1" role="tabpanel" aria-labelledby="pills-profile-tab" style="margin-right: 0px;margin-left: 0px;">
+                    <div class="row  col-md-12">
+                        <div class="item-box col-md-6 left-padding">
+                            @await Html.PartialAsync("_ProductBoxHome1", Model[0])
+                        </div>
+                        <div class="item-box col-md-6 mgn-left">
+                            @await Html.PartialAsync("_ProductBoxHome1", Model[1])
+                        </div>
+                    </div>
+                    <!--1 inner div -->
+
+                    <div class="row col-md-12 mgn-top" style="max-height:80%;">
+                        <div class="item-box col-md-6 left-padding">
+                            @await Html.PartialAsync("_ProductBoxHome1", Model[2])
+                        </div>
+                        <div class="item-box col-md-6 mgn-left">
+                            @await Html.PartialAsync("_ProductBoxHome1", Model[3])
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-contact1" role="tabpanel" aria-labelledby="pills-contact-tab">
+                    <div class="row  col-md-12">
+                        <div class="item-box col-md-6 left-padding">
+                            @await Html.PartialAsync("_ProductBoxHome1", Model[0])
+                        </div>
+                        <div class="item-box col-md-6 mgn-left">
+                            @await Html.PartialAsync("_ProductBoxHome1", Model[1])
+                        </div>
+                    </div>
+                    <!--1 inner div -->
+
+                    <div class="row col-md-12 mgn-top" style="max-height:80%;">
+                        <div class="item-box col-md-6 left-padding">
+                            @await Html.PartialAsync("_ProductBoxHome1", Model[2])
+                        </div>
+                        <div class="item-box col-md-6 mgn-left">
+                            @await Html.PartialAsync("_ProductBoxHome1", Model[3])
+                        </div>
+                    </div>
+                </div>
+                <!--1 inner div end-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class='col-md-12'>
+        <ul class="nav nav-pills float-right" id="pills-tab" role="tablist" style="margin-right:3%;">
+            <li class="nav-item">
+                <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">NEW PRODUCTS</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">ON SALE</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">BEST SELERS</a>
+            </li>
+        </ul>
+    </div>
+    <div class="col-4 nopadding">
+        <img class="base-img" src="~/images/main.PNG" />
+    </div>
+
+    <div class="col-8">
+        <div class="row">
+
+            <div class="tab-content" id="pills-tabContent">
+
+                <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active row" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab" style="margin-right: 0px;margin-left: 0px;">
+                        <div class="row  col-md-12">
+                            <div class="item-box col-md-6 left-padding">
+                                @await Html.PartialAsync("_ProductBoxHome1", Model[0])
+                            </div>
+                            <div class="item-box col-md-6 mgn-left">
+                                @await Html.PartialAsync("_ProductBoxHome1", Model[1])
+                            </div>
+                        </div>
+                        <!--1 inner div -->
+
+                        <div class="row col-md-12 mgn-top" style="max-height:80%;">
+                            <div class="item-box col-md-6 left-padding">
+                                @await Html.PartialAsync("_ProductBoxHome1", Model[2])
+                            </div>
+                            <div class="item-box col-md-6 mgn-left">
+                                @await Html.PartialAsync("_ProductBoxHome1", Model[3])
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab" style="margin-right: 0px;margin-left: 0px;">
+                        <div class="row  col-md-12">
+                            <div class="item-box col-md-6 left-padding">
+                                @await Html.PartialAsync("_ProductBoxHome1", Model[0])
+                            </div>
+                            <div class="item-box col-md-6 mgn-left">
+                                @await Html.PartialAsync("_ProductBoxHome1", Model[1])
+                            </div>
+                        </div>
+                        <!--1 inner div -->
+
+                        <div class="row col-md-12 mgn-top">
+                            <div class="item-box col-md-6 left-padding">
+                                @await Html.PartialAsync("_ProductBoxHome1", Model[2])
+                            </div>
+                            <div class="item-box col-md-6 mgn-left">
+                                @await Html.PartialAsync("_ProductBoxHome1", Model[3])
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+                        <div class="row  col-md-12">
+                            <div class="item-box col-md-6 left-padding">
+                                @await Html.PartialAsync("_ProductBoxHome1", Model[0])
+                            </div>
+                            <div class="item-box col-md-6 mgn-left">
+                                @await Html.PartialAsync("_ProductBoxHome1", Model[1])
+                            </div>
+                        </div>
+                        <!--1 inner div -->
+
+                        <div class="row col-md-12 mgn-top">
+                            <div class="item-box col-md-6 left-padding">
+                                @await Html.PartialAsync("_ProductBoxHome1", Model[2])
+                            </div>
+                            <div class="item-box col-md-6 mgn-left">
+                                @await Html.PartialAsync("_ProductBoxHome1", Model[3])
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+
+</div>
+<!--<div class="row pt-lg-5 pb-lg-5">
+    <div class='col-md-12 '>
+        <ul class="nav nav-pills float-right" id="pills-tab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home2" role="tab" aria-controls="pills-home" aria-selected="true">NEW PRODUCTS</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile2" role="tab" aria-controls="pills-profile" aria-selected="false">ON SALE</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact2" role="tab" aria-controls="pills-contact" aria-selected="false">BEST SALER</a>
+            </li>
+        </ul>
+    </div>
+    <div class="col-4 nopadding">
+        <img class="base-img" src="~/images/main.PNG" />
+    </div>
+
+    <div class="col-8">
+        <div class='row'>
+
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active row" id="pills-home2" role="tabpanel" aria-labelledby="pills-home-tab" style="display:flex;margin-right: 0px;margin-left: 0px;">-->
+<!--2 inner div -->
+<!--<div class="col-6 bottom-padding left-padding">
+        <div class="row subContainer">
+            <div class="col-6">
+                <img class="sub-img" src="~/images/sub1.PNG" />
+            </div>
+            <div class="col-6">
+                <div> <span class="fa fa-ellipsis-v"></span></div>
+                <div>Hilti Hand Drill</div>
+                <div>Item Weight : 5 kg</div>
+                <div>Wattage : 650 W </div>
+                <div>$ 210.00 </div>
+                <div class='sub-icons'>
+                    <a class="fa fa-arrows-alt-h"></a>
+                    <a class="fa fa-heart"></a>
+                    <a class="fa fa-shopping-cart"></a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-6 bottom-padding left-padding">
+        <div class="row subContainer">
+            <div class="col-6">
+                <img class="sub-img" src="~/images/sub1.PNG" />
+            </div>
+            <div class="col-6">
+                <div> <span class="fa fa-ellipsis-v"></span></div>
+                <div>Hilti Hand Drill</div>
+                <div>Item Weight : 5 kg</div>
+                <div>Wattage : 650 W </div>
+                <div>$ 210.00 </div>
+                <div class='sub-icons'>
+                    <a class="fa fa-arrows-alt-h"></a>
+                    <a class="fa fa-heart"></a>
+                    <a class="fa fa-shopping-cart"></a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-6 bottom-padding left-padding">
+        <div class="row subContainer">
+            <div class="col-6">
+                <img class="sub-img" src="~/images/sub1.PNG" />
+            </div>
+            <div class="col-6">
+                <div> <span class="fa fa-ellipsis-v"></span></div>
+                <div>Hilti Hand Drill</div>
+                <div>Item Weight : 5 kg</div>
+                <div>Wattage : 650 W </div>
+                <div>$ 210.00 </div>
+                <div class='sub-icons'>
+                    <a class="fa fa-arrows-alt-h"></a>
+                    <a class="fa fa-heart"></a>
+                    <a class="fa fa-shopping-cart"></a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-6 bottom-padding left-padding">
+        <div class="row subContainer">
+            <div class="col-6">
+                <img class="sub-img" src="~/images/sub1.PNG" />
+            </div>
+            <div class="col-6">
+                <div> <span class="fa fa-ellipsis-v"></span></div>
+                <div>Hilti Hand Drill</div>
+                <div>Item Weight : 5 kg</div>
+                <div>Wattage : 650 W </div>
+                <div>$ 210.00 </div>
+                <div class='sub-icons'>
+                    <a class="fa fa-arrows-alt-h"></a>
+                    <a class="fa fa-heart"></a>
+                    <a class="fa fa-shopping-cart"></a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+</div>
+<div class="tab-pane fade" id="pills-profile2" role="tabpanel" aria-labelledby="pills-profile-tab">2) ON SALE</div>
+<div class="tab-pane fade" id="pills-contact2" role="tabpanel" aria-labelledby="pills-contact-tab">2) BEST SALER</div>-->
+<!--2 inner div end-->
+<!--</div>
+        </div>
+    </div>
+</div>-->
+
+<style>
+    .nopadding {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .bottom-padding {
+        padding-bottom: 2px;
+    }
+
+    .left-padding {
+        border-right: 2px;
+    }
+
+    .subContainer {
+        height: 100%;
+        padding: 0px 5px 5px 5px;
+        margin-bottom: 10px;
+    }
+
+        .subContainer div {
+            background-color: #fff;
+        }
+
+    .base-img {
+        height: 86%;
+        width: 100%;
+    }
+
+    .sub-img {
+        height: 166px;
+        width: 157px;
+    }
+    /*me*/
+    .read-more {
+        color: #d35a31;
+        text-decoration: underline;
+    }
+
+    .center-1 .product-grid .item-box:nth-child(5n+1) {
+        background-color: #fff;
+    }
+
+    .item-box {
+        width: 100% !important;
+    }
+
+    /*slider*/
+    .carousel-inner img {
+        width: 100%;
+        height: 100%;
+    }
+
+    .carousel-control-next, .carousel-control-prev {
+        height: 32px;
+        color: black;
+        margin: 0;
+        padding: 0;
+        width: 32px !important;
+        right: 0 !important;
+    }
+
+    a.carousel-control-next:hover {
+        background-color: #d35a31;
+    }
+
+    a.carousel-control-prev:hover span {
+        color: white !important;
+    }
+
+    a.carousel-control-prev:hover {
+        background-color: #d35a31;
+    }
+
+    a.carousel-control-next:hover span {
+        color: white !important;
+    }
+
+    .carousel-control-prev {
+        right: 38px !important;
+        left: auto !important;
+    }
+
+    .sub-icons a {
+        background-color: #80808054;
+        color: gray;
+        padding: 7px;
+    }
+
+        .sub-icons a:hover {
+            text-decoration: none;
+            color: #d35a31;
+        }
+
+        .sub-icons a:nth-child(3) {
+            background-color: #d35a31;
+            color: #ffffff;
+        }
+
+    .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+        background-color: #d35a31 !important;
+        border-radius: 0px;
+    }
+
+    .nav-link:hover {
+        color: #d35a31;
+    }
+    .mgn-top {
+        margin-top: -6%;
+        max-height:60% !important;
+    }
+    .mgn-left {
+        margin-left: -1%;
+    }
+
+    .subContainer div:nth-child(2) {
+        padding-top: 5px;
+    }
+
+        .subContainer div:nth-child(2) div:nth-child(1) {
+            float: right;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .subContainer div:nth-child(2) div:nth-child(2) {
+            font-weight: bold;
+            font-size: 17px;
+        }
+
+        .subContainer div:nth-child(2) div:nth-child(3) {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .subContainer div:nth-child(2) div:nth-child(4) {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .subContainer div:nth-child(2) div:nth-child(5) {
+            font-size: 16px;
+            font-weight: bold;
+            color: #d35a31;
+            margin: 6px 0px;
+        }
+
+    /*mslider*/
+
+</style>

@@ -1,0 +1,75 @@
+﻿@model TopMenuModel.CategoryLineModel
+
+<li @if (Model.Level == 0) { <text> class="root-category-items" </text> }>
+    @if (Model.Category.SubCategories.Count > 0)
+    {
+        <a class="with-subcategories category-level2" id="@("level2anchor-" + Model.Category.Id)" style="font-weight: 400;font-size: 14px;font-family: Roboto;" href="@Url.RouteUrl("Category", new { SeName = Model.Category.SeName })">@Model.Category.Name
+        </a>
+
+        <div class="plus-button"></div>
+
+        @if (Model.Level == 0)
+        {
+            <div class="sublist-wrap" @*style="overflow-y: auto; height:410px;overflow-x: hidden;"*@>
+                <ul class="@(Model.Level == 0 ? "sublist" : "category-sublist")">
+                    <li class="back-button">
+                        <span>@T("SevenSpikes.Themes.Common.BackSublist")</span>
+                    </li>
+
+                    @foreach (var subCategory in Model.Category.SubCategories)
+                    {
+                        var categoryLineModel = new TopMenuModel.CategoryLineModel
+                        {
+                            Category = subCategory,
+                            Level = Model.Level + 1
+                        };
+                        @await Html.PartialAsync("_CategoryLine.TopMenu", categoryLineModel)
+                    }
+
+                </ul>
+            </div>
+        }
+        else
+        {
+<div class="dropdown dropdown-processed" id="@("dropdown-" + Model.Category.Id)" style="margin-top:-10px;">
+
+    <div class="dropdown-container" style="display: none; box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.19); padding-left: 5px; ">
+        <ul class="@(Model.Level == 0 ? "sublist" : "category-sublist")">
+            <li class="back-button">
+                <span>@T("SevenSpikes.Themes.Common.BackSublist")</span>
+            </li>
+
+            @foreach (var subCategory in Model.Category.SubCategories)
+            {
+                var categoryLineModel = new TopMenuModel.CategoryLineModel
+                {
+                    Category = subCategory,
+                    Level = Model.Level + 1
+                };
+                @await Html.PartialAsync("_CategoryLine.TopMenu", categoryLineModel)
+            }
+
+        </ul>
+    </div>
+
+    <a class="dropdown-link" href="javascript:void(0);" id="@("dpLink-" + Model.Category.Id)" style="text-align: center; display: block; color: white; background-color: #d35a31; width: 20px; ">
+        +
+    </a>
+
+</div>
+        }
+    }
+    else
+    {
+        if (Model.Category.NumberOfProducts.HasValue)
+        {
+            <a class="category-level2" id="@("level2anchor-" + Model.Category.Id)" style="font-weight: 400;font-size: 14px;font-family: Roboto;" href="@Url.RouteUrl("Category", new { SeName = Model.Category.SeName })">@Model.Category.Name @T("Categories.TotalProducts", Model.Category.NumberOfProducts.Value)</a>
+        }
+        else
+        {
+            <a class="category-level2" id="@("level2anchor-" + Model.Category.Id)" style="font-weight: 400;font-size: 14px;font-family: Roboto;" href="@Url.RouteUrl("Category", new { SeName = Model.Category.SeName })">@Model.Category.Name</a>
+        }
+
+    }
+    </li>
+

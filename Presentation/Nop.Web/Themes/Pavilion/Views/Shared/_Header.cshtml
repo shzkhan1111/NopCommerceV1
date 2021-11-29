@@ -1,0 +1,318 @@
+﻿@using Nop.Core
+@using Nop.Services.Configuration
+
+@inject IStoreContext storeContext
+@inject ISettingService settingService
+
+@{
+
+
+    var controllerName = Url.ActionContext.RouteData.Values["controller"].ToString();
+    var actionName = Url.ActionContext.RouteData.Values["action"].ToString();
+    var isHomePage = controllerName.Equals("home", StringComparison.InvariantCultureIgnoreCase) &&
+                        actionName.Equals("index", StringComparison.InvariantCultureIgnoreCase);
+
+    var currentStore = await storeContext.GetCurrentStoreAsync();
+    int storeId = currentStore.Id;
+    bool isHomeSliderFullWidth = await settingService.GetSettingByKeyAsync("pavilionthemesettings.ishomepagemainsliderfullwidth", false, storeId, true);
+    bool stickyCategoryMenuFlyout = await settingService.GetSettingByKeyAsync("pavilionthemesettings.StickyCategoryMenuFlyout", true, storeId, true);
+    bool showCategoriesInSideMenu = await settingService.GetSettingByKeyAsync("pavilionthemesettings.ShowCategoriesInSideMenu", true, storeId, true);
+}
+
+<div class="header">
+    @await Component.InvokeAsync("Widget", new { widgetZone = "header" })
+
+    <div class="header-upper">
+        <div class="center">
+            @await Component.InvokeAsync("AdminHeaderLinks")
+            @{
+                var taxTypeSelectorHtml = await Component.InvokeAsync("TaxTypeSelector");
+                var currencySelectorHtml = await Component.InvokeAsync("CurrencySelector");
+                var languageSelectorHtml = await Component.InvokeAsync("LanguageSelector");
+                var headerSelectorWidgetHtml = await Component.InvokeAsync("Widget", new { widgetZone = "header_selectors" });
+            }
+
+            @if (!String.IsNullOrEmpty(await taxTypeSelectorHtml.RenderHtmlContentAsync()) ||
+            !String.IsNullOrEmpty(await currencySelectorHtml.RenderHtmlContentAsync()) ||
+            !String.IsNullOrEmpty(await languageSelectorHtml.RenderHtmlContentAsync()) ||
+            !String.IsNullOrEmpty(await headerSelectorWidgetHtml.RenderHtmlContentAsync()))
+            {
+                <div class="header-selectors-wrapper">
+                    <label>@T("SevenSpikes.Themes.Pavilion.Header.Preferences")</label>
+                    <div class="header-selectors">
+                        @taxTypeSelectorHtml
+                        @currencySelectorHtml
+                        @languageSelectorHtml
+                        @headerSelectorWidgetHtml
+                    </div>
+                </div>
+                <div class="header-selector-widget" style="display: none;">@headerSelectorWidgetHtml</div>
+            }
+            <div class="header-links-wrapper" id="chatNotifications">
+                <small class="red new-message-count1" id="notificationsCount"></small>
+                <i class="fas fa-bell" style="color: grey;float:right;font-size:20px;" onclick="GotoQuote()"></i>
+                <input type="hidden" id="clientQuoteId" />
+            </div>
+            <div class="header-links-wrapper">
+                <label style="
+    margin-bottom: 0px;
+">@T("SevenSpikes.Themes.Pavilion.Header.MyAccount") </label>
+@await Component.InvokeAsync("HeaderLinks")
+@if (!Context.Request.Path.Value.Contains("/Messenger/Index/"))
+{
+    @await Component.InvokeAsync("ChatNotification")
+}
+
+</div>
+
+</div>
+</div>
+
+<div class="header-middle">
+    <div class="center">
+        <div class="header-logo">
+            @await Component.InvokeAsync("Logo")
+        </div>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="/" style="color: #343251; font-size: 14px; font-weight: 600">Home</a></li>
+                    <li><a href="/vendor/apply" style="color: #343251;font-size:14px;font-weight:600">Sellers</a></li>
+                    <li><a href="/about-us" style="color: #343251;font-size:14px;font-weight:600">about us</a></li>
+                    <li><a href="/ContactUs" style="color: #343251;font-size:14px;font-weight:600">contact us</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="header-menu-parent">
+            <div class="header-menu @if (showCategoriesInSideMenu){<text>categories-in-side-panel</text>}">
+                <div class="close-menu">
+                    <span>@T("SevenSpikes.Themes.Common.CloseMenu")</span>
+                </div>
+                @{
+                    var menuHtml = await Component.InvokeAsync("Widget", new { widgetZone = "theme_header_menu" });
+                }
+                @if (!String.IsNullOrEmpty(await menuHtml.RenderHtmlContentAsync()))
+                {
+                    @menuHtml
+                }
+                else
+                {
+                    @await Component.InvokeAsync("TopMenu")
+                }
+            </div>
+        </div>
+        @await Component.InvokeAsync("FlyoutShoppingCart")
+    </div>
+</div>
+
+<div class="header-lower">
+    <div class="center">
+        @if (showCategoriesInSideMenu)
+        {
+            <span class="category-navigation-title">@T("SevenSpikes.Themes.Pavilion.Header.AllCategories")</span>
+
+            if (!isHomePage || isHomeSliderFullWidth)
+            {
+                <div class="category-navigation-list-wrapper">
+                    <ul class="category-navigation-list @if (stickyCategoryMenuFlyout){<text>sticky-flyout</text>}"></ul>
+                </div>
+            }
+        }
+        <div class="search-box store-search-box @if (!showCategoriesInSideMenu){<text>full-width</text>}">
+            @await Component.InvokeAsync("SearchBox")
+        </div>
+
+    </div>
+</div>
+</div>
+
+@if (isHomePage)
+{
+    var homePageSliderCss = isHomeSliderFullWidth ? "slider-fullwidth" : "slider-right-column";
+
+    <div class="two-columns-area @homePageSliderCss">
+        @if (isHomeSliderFullWidth)
+        {
+            @await Component.InvokeAsync("Widget", new { widgetZone = "home_page_main_slider" });
+            @await Component.InvokeAsync("Widget", new { widgetZone = "home_page_search_widget" })
+        }
+
+        <div class="center">
+            <div class="two-columns-area-left">
+                @if (showCategoriesInSideMenu && !isHomeSliderFullWidth)
+                {
+                    <div class="category-navigation-list-wrapper">
+                        <ul class="category-navigation-list @if (stickyCategoryMenuFlyout){<text>sticky-flyout</text>}"></ul>
+                    </div>
+                }
+
+            </div>
+            <div class="two-columns-area-right">
+                @*<div class="custom-slider-wrapper">
+                        @await Component.InvokeAsync("Widget", new { widgetZone = "home_page_main_slider" })
+                    </div>
+                    <div class="theme-banner-small">
+                        <img style="width:100%;height:100%;" src="~/images/slider/oil and gas.jpg" alt="">
+                    </div>
+                    <div class="theme-banner-small">
+                        <img style="width:100%;height:100%;" src="~/images/slider/oil and gas.jpg" alt="">
+                    </div>*@
+                @*@await Component.InvokeAsync("Widget", new { widgetZone = "home_page_main_slider" })*@
+                @await Component.InvokeAsync("HomeSlider")
+
+            </div>
+
+            @*<div class="two-columns-area-right" style="margin-top:-40px !important;">
+                    <div class="theme-banner-small">
+                        <img style="width:100%;height:100%;" src="~/images/slider/oil and gas.jpg" alt="">
+                    </div>
+                    <div class="theme-banner-small">
+                        <img style="width:100%;height:100%;" src="~/images/slider/oil and gas.jpg" alt="">
+                    </div>
+                    <div class="theme-banner-small">
+                        <img style="width:100%;height:100%;" src="~/images/slider/oil and gas.jpg" alt="">
+                    </div>
+                </div>*@
+        </div>
+
+        <div class="center" style="margin-top: 20px;">
+            <div id="featuredProds" class="two-columns-area-left" style="margin-top: 2px; overflow: hidden !important;">
+                @await Component.InvokeAsync("Widget", new { widgetZone = "homepage_sidebar_after" })
+            </div>
+            <div id="trendingProds" class="two-columns-area-right" style="overflow: hidden !important;height:100% !important">
+                @await Component.InvokeAsync("Widget", new { widgetZone = "homepage_slider_after" })
+            </div>
+        </div>
+
+    </div>
+}
+
+<style>
+
+    /*nav*/
+    .container-fluid {
+        flex-direction: column;
+        align-content: flex-start;
+    }
+
+    .store-search-box input.search-box-text {
+        /*width: 40pc !important;*/
+        font-size: 20px;
+        margin-left: 0px !important;
+        color: black !important;
+        background: #fff !important;
+    }
+
+    .store-search-box input.search-box-text::placeholder {
+        color: #000000a6;
+    }
+
+    .new-message-count1 {
+        border-radius: 0.8em;
+        -moz-border-radius: 0.8em;
+        -webkit-border-radius: 0.8em;
+        color: #ffffff;
+        display: inline-block;
+        font-weight: bold;
+        line-height: 1em;
+        text-align: center;
+        margin-top: 22px;
+        margin-left: -3px;
+        float: right;
+        width: 1em;
+        color: red;
+    }
+</style>
+
+<script>
+
+    //window.onload = function (e) {
+    //    //$("#trendingProds").height($("#featuredProds").height());
+    //}
+
+    @*function GotoQuote() {
+        //location.href = "/Messenger/Index/05c8be57-dd38-476f-a079-80e6ab8bc57b";
+        var quoteId = $('#clientQuoteId').val();
+        var serverUrl = '@Url.Action("GetCustomerQuoteGuid", "RequestQuote")';
+
+        if (quoteId != '0') {
+            $.ajax({
+                url: serverUrl,
+                type: "POST",
+                data: { QuoteId: quoteId },
+                success: function (response) {
+                    if (response.success) {
+                        location.href = "/Messenger/Index/" + response.quoteGuid;
+                    }
+                    else {
+
+                    }
+                }
+            });
+        }
+    }*@
+
+    function GotoQuote() {
+        //location.href = "/Messenger/Index/05c8be57-dd38-476f-a079-80e6ab8bc57b";
+        var quoteId = $('#clientQuoteId').val();
+        if (quoteId != '' && quoteId != '0') {
+            var serverUrl = '@Url.Action("GetCustomerQuoteGuid", "RequestQuote")';
+            var vendor = false;
+            if (quoteId.includes("vend")) {
+                quoteId = quoteId.replace("vend", "");
+                serverUrl = '@Url.Action("GetVendorQuoteGuid", "RequestQuote")';
+                vendor = true;
+            }
+
+            $.ajax({
+                url: serverUrl,
+                type: "GET",
+                data: { QuoteId: quoteId },
+                success: function (response) {
+                    if (response.success) {
+                        location.href = "/Messenger/Index/" + response.quoteGuid;
+                    }
+                    else {
+
+                    }
+                }
+            });
+        }
+    }
+
+    $(document).ready(function () {
+
+        $('div.dropdown').each(function () {
+            var $dropdown = $(this);
+            $("a.dropdown-link", $dropdown).click(function (e) {
+                $("div.dropdown-container").hide();
+                e.preventDefault();
+                var dropDownId = $dropdown[0].id;
+                var dropDownDetail = "div#" + dropDownId + ".dropdown.dropdown-processed";
+                $("div.dropdown-container", dropDownDetail).show();
+                //$("div.dropdown-container").not($div).hide();
+                return false;
+            });
+
+        });
+
+        $('html').click(function () {
+            $("div.dropdown-container").hide();
+        });
+
+        $('a.category-level2').each(function () {
+            var $anchor = $(this);
+            $anchor.mouseover(function (e) {
+                var anchorId = $anchor[0].id;
+                var subAnchorId = "#dpLink-" + anchorId.split("-")[1];
+                $(subAnchorId).click();
+                return true;
+            });
+
+        });
+
+    });
+
+
+</script>

@@ -1,0 +1,7 @@
+﻿{
+  //"DataConnectionString": "Data Source=DESKTOP-E30NNSG\\SQLEXPRESS;Initial Catalog=NopCommerceAnt;Integrated Security=true;Persist Security Info=False;User ID=IfsAdmin;Password=[-HTSbRBDDP67sxg",
+  "DataConnectionString": "Server=DESKTOP-E30NNSG\\SQLEXPRESS;Database=NopCommerceAnt;Trusted_Connection=True;MultipleActiveResultSets=true",
+  "DataProvider": "sqlserver",
+  "SQLCommandTimeout": null,
+  "RawDataSettings": {}
+}

@@ -1,0 +1,6 @@
+﻿{
+  "DataConnectionString": "Data Source=tcp:equiphound-dev.database.windows.net,1433;Initial Catalog=NopCommerce_Test;Integrated Security=False;Persist Security Info=False;User ID=IfsAdmin;Password=[-HTSbRBDDP67sxg",
+  "DataProvider": "sqlserver",
+  "SQLCommandTimeout": null,
+  "RawDataSettings": {}
+}

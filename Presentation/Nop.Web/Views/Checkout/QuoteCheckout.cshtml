@@ -1,0 +1,44 @@
+﻿@model ShoppingCartModel
+@using Nop.Core
+@using Nop.Services.Customers
+@inject IWebHelper webHelper
+@inject IWorkContext workContext
+@inject ICustomerService _customerService
+@{
+    Layout = "_ColumnsOne";
+
+    //scripts
+    Html.AddScriptParts(ResourceLocation.Footer, "~/js/public.accordion.js");
+    Html.AddScriptParts(ResourceLocation.Footer, "~/js/public.onepagecheckout.js");
+
+    var storeLocation = webHelper.GetStoreLocation();
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Checkout").Text);
+    //page class
+}
+
+<div class="page checkout-page">
+    
+    <div class="page-body checkout-data">
+        <ol class="opc" id="checkout-steps">
+            <li id="opc-confirm_order" class="tab-section allow">
+                <div class="step-title">
+                    <h2 class="title">@T("RequestQuote.ConfirmOrder")</h2>
+                </div>
+                <div id="checkout-step-confirm-order" class="step a-item" style="display: none;">
+                    @await Component.InvokeAsync("QuoteSummary", new { prepareAndDisplayOrderReviewData = true })
+                    <div class="buttons align-right" id="confirm-order-buttons-container" style="margin-top:40px;padding-bottom:40px;">
+                        <button type="submit" style="float: right;" class="button-1 confirm-order-next-step-button" onclick="setLocation('@(Url.Action("SaveQuoteRequest", "Checkout"))')">@T("Common.Confirm")</button>
+                        <span class="please-wait" id="confirm-order-please-wait" style="display: none;">@T("Checkout.SubmittingOrder")</span>
+                    </div>
+                </div>
+            </li>
+        </ol>
+    </div>
+    <script asp-location="Footer">
+        Accordion.init('checkout-steps', '.step-title', true);
+        Accordion.openSection('#opc-confirm_order');
+        Checkout.init('@(storeLocation)cart/');
+    </script>
+</div>

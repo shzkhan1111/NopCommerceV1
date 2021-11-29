@@ -1,0 +1,6 @@
+
+alter table CustomerQuoteItem Add Deleted bit
+
+alter table VendorQuoteItem Add Deleted bit
+
+alter table VendorQuote add CustomerQuoteId int

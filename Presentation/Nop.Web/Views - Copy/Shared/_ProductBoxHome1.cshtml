@@ -1,0 +1,59 @@
+﻿@model ProductOverviewModel
+
+@using Nop.Core
+@using Nop.Core.Domain.Catalog
+@using Nop.Core.Domain.Orders
+@using Nop.Core.Domain.Tax
+
+@inject CatalogSettings catalogSettings
+@inject IWorkContext workContext
+@inject Microsoft.AspNetCore.Mvc.ViewComponents.IViewComponentSelector viewComponentSelector
+
+@{
+    //prepare "Add to cart" AJAX link
+    var addtocartlink = "";
+    var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
+    var quantity = 1;
+    if (Model.ProductPrice.ForceRedirectionAfterAddingToCart)
+    {
+        addtocartlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = Model.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity, forceredirection = Model.ProductPrice.ForceRedirectionAfterAddingToCart });
+    }
+    else
+    {
+        addtocartlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = Model.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity });
+    }
+
+    var addtowishlistlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = Model.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity });
+    var addtocomparelink = Url.RouteUrl("AddProductToCompare", new { productId = Model.Id });
+}
+
+<div class="row subContainer">
+    <div class="col-4" style="display: inline-block;padding:0%">
+        <a href="@Url.RouteUrl("Product", new { SeName = Model.SeName })" title="@Model.DefaultPictureModel.Title" style="width: 100%; height: 100%; ">
+
+            <img alt="@Model.DefaultPictureModel.AlternateText" src="@Model.DefaultPictureModel.ImageUrl" title="@Model.DefaultPictureModel.Title" style="width: 100%; height: 100%; margin-left: 0%;" />
+
+        </a>
+        @*<img alt="@Model.DefaultPictureModel.AlternateText" src="@Model.DefaultPictureModel.ImageUrl" title="@Model.DefaultPictureModel.Title" style="width: 100%; height: 100%;margin-left:0%;" />*@
+    </div>
+
+    <div class="col-8" >
+        <div style="padding-left:23%"> <span class="fa fa-ellipsis-v"></span></div>
+        <div>
+            <h3 class="product-title" style="height:90%;margin-top:-2%;height:32px;">
+                <a href="@Url.RouteUrl("Product", new { SeName = Model.SeName })">@Model.Name</a>
+            </h3>
+        </div>
+        <div class="description" id="homepageProd-sm" style="margin-left:0%;margin-top:-13%;font-size:12px;">
+            @Html.Raw(Model.ShortDescription)
+        </div>
+        <div style="margin-top: -8%; color: #d35a31;"><strong>@Model.ProductPrice.Price</strong></div>
+        <div class='sub-icons'>
+            <a href="javascript:void(0);" class="fa fa-arrows-alt-h" onclick="AjaxCart.addproducttocomparelist('@addtocomparelink');return false;"></a>
+            <a href="javascript:void(0);" class="fa fa-heart" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink');return false;"></a>
+            <a href="javascript:void(0);" class="fa fa-shopping-cart" onclick="AjaxCart.addproducttocart_catalog('@addtocartlink');return false;"></a>
+        </div>
+    </div>
+
+
+</div>

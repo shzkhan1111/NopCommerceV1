@@ -1,0 +1,336 @@
+﻿@using Nop.Core
+@using Nop.Services.Configuration
+
+@inject IStoreContext storeContext
+@inject ISettingService settingService
+
+@{
+    var controllerName = Url.ActionContext.RouteData.Values["controller"].ToString();
+    var actionName = Url.ActionContext.RouteData.Values["action"].ToString();
+    var isHomePage = controllerName.Equals("home", StringComparison.InvariantCultureIgnoreCase) &&
+                        actionName.Equals("index", StringComparison.InvariantCultureIgnoreCase);
+
+    var currentStore = await storeContext.GetCurrentStoreAsync();
+    int storeId = currentStore.Id;
+    bool isHomeSliderFullWidth = await settingService.GetSettingByKeyAsync("pavilionthemesettings.ishomepagemainsliderfullwidth", false, storeId, true);
+    bool stickyCategoryMenuFlyout = await settingService.GetSettingByKeyAsync("pavilionthemesettings.StickyCategoryMenuFlyout", true, storeId, true);
+    bool showCategoriesInSideMenu = await settingService.GetSettingByKeyAsync("pavilionthemesettings.ShowCategoriesInSideMenu", true, storeId, true);
+}
+
+<div class="header">
+    @await Component.InvokeAsync("Widget", new { widgetZone = "header" })
+
+    <div class="header-upper">
+        <div class="center">
+            @await Component.InvokeAsync("AdminHeaderLinks")
+            @{
+                var taxTypeSelectorHtml = await Component.InvokeAsync("TaxTypeSelector");
+                var currencySelectorHtml = await Component.InvokeAsync("CurrencySelector");
+                var languageSelectorHtml = await Component.InvokeAsync("LanguageSelector");
+                var headerSelectorWidgetHtml = await Component.InvokeAsync("Widget", new { widgetZone = "header_selectors" });
+            }
+
+            @if (!String.IsNullOrEmpty(await taxTypeSelectorHtml.RenderHtmlContentAsync()) ||
+              !String.IsNullOrEmpty(await currencySelectorHtml.RenderHtmlContentAsync()) ||
+              !String.IsNullOrEmpty(await languageSelectorHtml.RenderHtmlContentAsync()) ||
+              !String.IsNullOrEmpty(await headerSelectorWidgetHtml.RenderHtmlContentAsync()))
+            {
+                <div class="header-selectors-wrapper">
+                    <label>@T("SevenSpikes.Themes.Pavilion.Header.Preferences")</label>
+                    <div class="header-selectors">
+                        @taxTypeSelectorHtml
+                        @currencySelectorHtml
+                        @languageSelectorHtml
+                        @headerSelectorWidgetHtml
+                    </div>
+                </div>
+                <div class="header-selector-widget" style="display: none;">@headerSelectorWidgetHtml</div>
+            }
+            <div class="header-links-wrapper" id="chatNotifications"> 
+                <small class="red new-message-count1" id="notificationsCount"></small>
+                <i class="fas fa-bell" style="color: grey;float:right;font-size:20px;" onclick="GotoQuote()"></i>
+                <input type="hidden" id="clientQuoteId" />
+             </div>
+            <div class="header-links-wrapper">
+                <label style="
+    margin-bottom: 0px;
+">@T("SevenSpikes.Themes.Pavilion.Header.MyAccount") </label>
+            @await Component.InvokeAsync("HeaderLinks")
+            @if (!Context.Request.Path.Value.Contains("/Messenger/Index/"))
+            {
+                @await Component.InvokeAsync("ChatNotification")
+            }
+
+            </div>
+
+        </div>
+</div>
+
+<div class="header-middle">
+    <div class="center">
+        <div class="header-logo">
+            @await Component.InvokeAsync("Logo")
+        </div>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Home</a></li>
+                    <li><a href="#">Sallers</a></li>
+                    <li><a href="#">about us</a></li>
+                    <li><a href="#">contact us</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="header-menu-parent">
+            <div class="header-menu @if (showCategoriesInSideMenu){<text>categories-in-side-panel</text>}">
+                <div class="close-menu">
+                    <span>@T("SevenSpikes.Themes.Common.CloseMenu")</span>
+                </div>
+                @{
+                    var menuHtml = await Component.InvokeAsync("Widget", new { widgetZone = "theme_header_menu" });
+                }
+                @if (!String.IsNullOrEmpty(await menuHtml.RenderHtmlContentAsync()))
+                {
+                    @menuHtml
+                }
+                else
+                {
+                    @await Component.InvokeAsync("TopMenu")
+                }
+            </div>
+        </div>
+        @await Component.InvokeAsync("FlyoutShoppingCart")
+    </div>
+</div>
+
+<div class="header-lower">
+    <div class="center">
+        @if (showCategoriesInSideMenu)
+        {
+            <span class="category-navigation-title">@T("SevenSpikes.Themes.Pavilion.Header.AllCategories")</span>
+
+            if (!isHomePage || isHomeSliderFullWidth)
+            {
+                <div class="category-navigation-list-wrapper">
+                    <ul class="category-navigation-list @if (stickyCategoryMenuFlyout){<text>sticky-flyout</text>}"></ul>
+                </div>
+            }
+        }
+        <div class="search-box store-search-box @if (!showCategoriesInSideMenu){<text>full-width</text>}">
+            @await Component.InvokeAsync("SearchBox")
+        </div>
+
+    </div>
+</div>
+</div>
+
+@if (isHomePage)
+{
+    var homePageSliderCss = isHomeSliderFullWidth ? "slider-fullwidth" : "slider-right-column";
+
+    <div class="two-columns-area @homePageSliderCss">
+        @if (isHomeSliderFullWidth)
+        {
+            @await Component.InvokeAsync("Widget", new { widgetZone = "home_page_main_slider" });
+            @await Component.InvokeAsync("Widget", new { widgetZone = "home_page_search_widget" })
+        }
+
+        <div class="center">
+            <div class="two-columns-area-left">
+                @if (showCategoriesInSideMenu && !isHomeSliderFullWidth)
+                {
+                    <div class="category-navigation-list-wrapper">
+                        <ul class="category-navigation-list @if (stickyCategoryMenuFlyout){<text>sticky-flyout</text>}"></ul>
+                    </div>
+                }
+                
+                @await Component.InvokeAsync("Widget", new { widgetZone = "homepage_sidebar_after" })
+
+            </div>
+            <div class="two-columns-area-right">
+                @*@if (!isHomeSliderFullWidth)
+        {
+            <div class="row">
+                <div class="col-8">
+                    <div style="height:100%;width:100%">
+                        @await Component.InvokeAsync("Widget", new { widgetZone = "home_page_main_slider" })
+                    </div>
+                </div>
+            </div>
+            @await Component.InvokeAsync("Widget", new { widgetZone = "home_page_search_widget" })
+
+        }*@
+
+                <div class="row">
+                    <div class="col-md-4">
+                        @await Component.InvokeAsync("Widget", new { widgetZone = "home_page_main_slider" })
+                    </div>
+                    
+                </div>
+
+                @await Component.InvokeAsync("Widget", new { widgetZone = "homepage_slider_after" })
+
+
+
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .main-img {
+        max-width: 100%;
+        max-height: 100%;
+        display: block; /* remove extra space below image */
+        margin-top: 10px;
+    }
+
+    .main-img1 {
+        max-width: 100%;
+        max-height: 100%;
+        display: block; /* remove extra space below image */
+        margin-top: 10px;
+        margin-left: -10px;
+    }
+
+    /*nav*/
+    .container-fluid {
+        flex-direction: column;
+        align-content: flex-start;
+    }
+
+    .store-search-box input.search-box-text {
+        width: 40pc !important;
+        font-size: 20px;
+        color: black !important;
+        background: #fff !important;
+    }
+
+        .store-search-box input.search-box-text::placeholder {
+            color: #000000a6;
+        }
+
+    #top-slider .carousel-control-prev, #top-slider .carousel-control-next {
+        background-color: transparent;
+        height: auto;
+        width: 23px !important;
+    }
+
+        #top-slider .carousel-control-prev span, #top-slider .carousel-control-next span {
+            background-color: #000;
+            height: 34px;
+            width: 20px;
+            margin-right: 5px;
+        }
+
+    #top-slider .carousel-control-prev {
+        right: auto !important;
+    }
+
+    #top-slider .carousel-control-next {
+        left: auto !important;
+    }
+
+    #top-slider .carousel-indicators li {
+        background-clip: border-box !important;
+        border-radius: 100%;
+        border-top: 5px solid transparent !important;
+        border-bottom: 10px solid transparent !important;
+        width: 15px !important;
+        height: auto !important;
+    }
+
+    #top-slider .carousel-indicators .active {
+        background-color: #d35a31;
+    }
+
+    .top-img button {
+        position: absolute !important;
+        bottom: 0;
+        margin: 7px;
+        padding: 2px 11px;
+        background-color: #f9f7f1cc;
+        color: #636363;
+        font-size: 16px;
+        text-transform: uppercase;
+        font-weight: 500;
+        border: transparent;
+    }
+
+        .top-img button:hover {
+            background-color: #d35a31;
+            color: #fff;
+        }
+
+    .new-message-count1 {
+        border-radius: 0.8em;
+        -moz-border-radius: 0.8em;
+        -webkit-border-radius: 0.8em;
+        color: #ffffff;
+        display: inline-block;
+        font-weight: bold;
+        line-height: 1em;
+        text-align: center;
+        margin-top: 22px;
+        margin-left:-3px;
+        float: right;
+        width: 1em;
+        color:red;
+    }
+</style>
+
+<script>
+
+    @*function GotoQuote() {
+        //location.href = "/Messenger/Index/05c8be57-dd38-476f-a079-80e6ab8bc57b";
+        var quoteId = $('#clientQuoteId').val();
+        var serverUrl = '@Url.Action("GetCustomerQuoteGuid", "RequestQuote")';
+
+        if (quoteId != '0') {
+            $.ajax({
+                url: serverUrl,
+                type: "POST",
+                data: { QuoteId: quoteId },
+                success: function (response) {
+                    if (response.success) {
+                        location.href = "/Messenger/Index/" + response.quoteGuid;
+                    }
+                    else {
+
+                    }
+                }
+            });
+        }
+    }*@
+
+    function GotoQuote() {
+        //location.href = "/Messenger/Index/05c8be57-dd38-476f-a079-80e6ab8bc57b";
+        var quoteId = $('#clientQuoteId').val();
+
+        if (quoteId != '0') {
+            var serverUrl = '@Url.Action("GetCustomerQuoteGuid", "RequestQuote")';
+            var vendor = false;
+            if (quoteId.includes("vend")) {
+                quoteId = quoteId.replace("vend", "");
+                serverUrl = '@Url.Action("GetVendorQuoteGuid", "RequestQuote")';
+                vendor = true;
+            }
+
+            $.ajax({
+                url: serverUrl,
+                type: "GET",
+                data: { QuoteId: quoteId },
+                success: function (response) {
+                    if (response.success) {
+                        location.href = "/Messenger/Index/" + response.quoteGuid;
+                    }
+                    else {
+
+                    }
+                }
+            });
+        }
+    }
+
+</script>

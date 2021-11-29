@@ -1,0 +1,724 @@
+﻿@model ChatBoxModel
+    <style>
+        .container-box {
+            background-color: #f9fafc;
+            border-style: solid;
+            border: 1px solid #dbe5ed;
+            border-radius: 20px;
+        }
+
+        .container-box-area {
+            background-color: #ffff;
+        }
+
+        .qq-upload-drop-area, .qq-upload-extra-drop-area {
+            background: #728fce !important;
+        }
+
+        .main-file-uploader:hover {
+            background: #9aacd5 !important;
+        }
+
+        .chat-message-container {
+            background-color: #afbbc6;
+            border-radius: 15px;
+            color: white;
+            font-weight: lighter;
+            padding: 5px 10px 5px 15px;
+            float: left !important;
+        }
+
+        .delete-message {
+            background-color: white !important;
+            color: #999 !important;
+            border: 1px solid #ccc !important;
+            border-radius: 15px;
+            font-weight: lighter;
+            padding: 5px 10px 5px 15px;
+            float: left !important;
+        }
+
+        .delete-my-message {
+            float: right !important;
+        }
+
+
+        .my-message {
+            background-color: #76c00d;
+            float: right !important;
+        }
+
+        .oper-btn {
+            margin-left: 2px;
+            margin-right: 2px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .oper-btn-cb {
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        chat-message-container::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        .time-right {
+            float: right;
+            color: #aaa;
+            font-size: small;
+        }
+
+        .time-left {
+            float: left;
+            color: #999;
+            font-size: small;
+        }
+
+        .bb {
+            border-bottom: 1px solid #dbe5ed;
+        }
+
+        .container-title {
+            color: #7d8285;
+        }
+
+        .type-message-container {
+            position: relative;
+            background-color: white;
+            border-radius: 30px;
+            margin: 10px 20px 20px 20px;
+        }
+
+        .input-msg-write input {
+            background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+            border: medium none;
+            color: #4c4c4c;
+            font-size: 15px;
+            min-height: 48px;
+            width: 100%;
+            outline: none;
+            padding: 20px;
+        }
+
+        .msg-send-btn {
+            background: #76c00d none repeat scroll 0 0;
+            border: medium none;
+            border-radius: 50%;
+            color: #fff;
+            cursor: pointer;
+            font-size: 17px;
+            height: 35px;
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            width: 35px;
+            display: inline-block;
+        }
+
+        .zoomed {
+            zoom: 67%;
+        }
+
+        .emoji-select-button {
+            background: White none repeat scroll 0 0;
+            border: medium none;
+            border-radius: 50%;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 17px;
+            height: 35px;
+            position: absolute;
+            top: 5px;
+            width: 35px;
+            display: inline-block;
+        }
+
+        .attach-select-button {
+            background: White none repeat scroll 0 0;
+            border: medium none;
+            border-radius: 50%;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 17px;
+            height: 35px;
+            position: absolute;
+            top: 5px;
+            right: 50px;
+            width: 35px;
+            display: inline-block;
+        }
+
+        container-title
+        .button-container {
+            width: 100%;
+            text-align: center;
+        }
+
+        .align-text-center {
+            text-align: center;
+        }
+
+        .align-text-right {
+            text-align: right;
+        }
+
+        .align-text-left {
+            text-align: left;
+        }
+
+        .font-size-small {
+            font-size: small;
+        }
+
+        .font-size-smaller {
+            font-size: smaller;
+        }
+
+        .font-size-larger {
+            font-size: larger;
+        }
+
+        .font-size-large {
+            font-size: large;
+        }
+
+        .my-success-button {
+            background-color: #76c00d;
+            border-radius: 28px;
+            display: inline-block;
+            cursor: pointer;
+            color: #ffffff;
+            padding: 5px 30px;
+            text-decoration: none;
+            border: #fff;
+        }
+
+        .my-close-button {
+            background-color: black;
+            border-radius: 28px;
+            display: inline-block;
+            cursor: pointer;
+            color: #ffffff;
+            padding: 5px 30px;
+            text-decoration: none;
+            border: #fff;
+        }
+
+            .my-success-button:hover {
+                background-color: #a1e344;
+            }
+
+        .my-cancel-button {
+            background-color: #afbbc6;
+            border-radius: 28px;
+            display: inline-block;
+            cursor: pointer;
+            color: #ffffff;
+            padding: 5px 30px;
+            text-decoration: none;
+            border: #fff;
+        }
+
+            .my-cancel-button:hover {
+                background-color: #a1e344;
+            }
+
+        .chat-head-title {
+            display: block;
+            overflow: hidden;
+        }
+
+        .user-status {
+            color: #a1e344;
+        }
+
+        .round-chat-name {
+            display: inline-block;
+            font-size: 1em;
+            width: 2.5em;
+            height: 2.5em;
+            line-height: 2.5em;
+            text-align: center;
+            border-radius: 50%;
+            background: plum;
+            color: white;
+        }
+
+        .round-chat-name-selected {
+            display: inline-block;
+            font-size: 1em;
+            width: 2.5em;
+            height: 2.5em;
+            line-height: 2.5em;
+            text-align: center;
+            border-radius: 50%;
+            background: blue;
+            color: white;
+        }
+
+        .round-chat-name-quote {
+            display: inline-block;
+            font-size: 1em;
+            width: 2.5em;
+            height: 2.5em;
+            line-height: 2.5em;
+            text-align: center;
+            border-radius: 50%;
+            background: darkgray;
+            color: white;
+        }
+
+        #chat-head-icon {
+            float: left
+        }
+
+        .hide {
+            display: none;
+        }
+
+
+        #chat-head-icon img {
+            display: block;
+        }
+
+        .chat-message-container:hover .hide {
+            display: inline-block;
+            color: darkslategrey;
+        }
+
+        .new-message-count {
+            background: red;
+            border-radius: 0.8em;
+            -moz-border-radius: 0.8em;
+            -webkit-border-radius: 0.8em;
+            color: #ffffff;
+            display: inline-block;
+            font-weight: bold;
+            line-height: 1.6em;
+            margin-right: 15px;
+            text-align: center;
+            width: 1.6em;
+        }
+
+        .hide-checkbox {
+            display: none;
+        }
+    </style>
+
+    <div class="container-box">
+        <div class="container-title bb p-3">
+            <div class="row">
+                <div class="col-10">
+                    <span id="spanProdName"> Chat Detail </span>
+                </div>
+
+                <div class="col-2 align-text-right">
+                    <span><i class="fa fa-copy" title="copy" onclick="copyToClipboard()"></i> </span>
+                    <span><i class="fa fa-paste" title="paste" onclick="copyFromClipboard()"></i> </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="pb-2 chatPanel" id="chatPanel59" style="overflow-y: scroll; height:210px;overflow-x: hidden;" class="well well-lg">
+                    <div class="fa-2x" style="text-align: center;margin-top:12%;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*Customer*@
+        @*<div class="row pl-3 pr-3 pb-1">
+            <div class="col-12">
+                <div class="chat-message-container">
+                    <p>Hello. How are you today?</p>
+                </div>
+            </div>
+        </div>
+        <div class="row pl-3 pr-3 pb-1">
+            <div class="col-12">
+                <div class="time-left">11:01</div>
+            </div>
+        </div>*@
+
+
+
+        @*User*@
+        @*<div class="row pl-3 pr-3 pb-1">
+            <div class="col-12">
+                <div class="chat-message-container my-message">
+                    <p>Hey! I'm fine. Thanks for asking!</p>
+                </div>
+            </div>
+        </div>
+        <div class="row pl-3 pr-3 pb-1">
+            <div class="col-12">
+                <div class="time-right">11:01</div>
+            </div>
+        </div>*@
+
+        @*TYPE Message*@
+        <div class="type-message-container">
+            <div class="row input-msg-write">
+                <div class="col-9">
+                    <input type="text" class="write_msg" id="write_msg_box" placeholder="Type a message" />
+                </div>
+                <div class="col-3 button-container">
+                    <button class="attach-select-button hide" id="btnSetNewMessage" onclick="setAsNewMessage()"><i class="fa fa-times"></i></button>
+                    <button class="msg-send-btn" type="button" onclick="SendClickMessage()"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+<script src="/lib/browser/signalr.min.js"></script>
+
+<script type="text/javascript">
+    var connId = '-100';
+    var resetSeenMesgs = false;
+    var chatId = '@(Model.VendorId == 0 ? Model.ChatId.ToString() : "vend" + Model.ChatId.ToString() )';
+    var userId = '@Model.UserId';
+    var filterId = '';
+    var editId = '';
+    var notificationFlag = false;
+    var chatURL = '@T("signalR.Chat.URL")';
+    //var connection = new signalR.HubConnectionBuilder()
+    //    .withUrl('https://localhost:44378/chat')
+    //    .build();
+
+    var connection = new signalR.HubConnectionBuilder()
+        .withUrl(chatURL)
+        .build();
+
+    async function start() {
+        try {
+            await connection.start().then(function () {
+                connection.invoke("getConnectionId").then(function (connectionId) {
+                    connId = connectionId;
+                    console.log("SignalR Connected.");
+                });
+            });;
+        } catch (err) {
+            console.log(err);
+            setTimeout(start, 2000);
+        }
+    };
+
+    connection.onclose(async () => {
+        connId = "-100";
+        console.log("doscinnected, connecting again");
+        await start();
+    });
+
+    // Start the connection.
+    start();
+
+
+    $('#write_msg_box').on('keypress', function (e) {
+        if (e.which === 13) {
+            sendMessage($('#write_msg_box').val());
+            $('#write_msg_box').val('');
+        }
+    });
+
+    connection.on('UpdateChat', (user, message, msgId, time, deleted) => {
+        updateChat(user, message, msgId, time, deleted);
+    });
+    connection.on('Archived', (message) => {
+        updateChat('system', message);
+    });
+    connection.on('ScrollDown', () => {
+        scrollDown();
+    });
+
+    connection.on('ReloadChat', () => {
+        reloadChat();
+    });
+
+    connection.on('PushNotification', (msgCount, chatId) => {
+        pushNotification(msgCount, chatId);
+    });
+
+    connection.on('SendEmailToNotSignInUser', (usersIdsList) => {
+        SendEmailToNotSignInUser(usersIdsList);
+    });
+
+    connection.on('AddInQuoteList', (qchatId) => {
+        addInQuoteList(qchatId);
+    });
+
+
+    function getProductChat(_filterId, quoteId, productName, customerName, vendorId) {
+        if (vendorId > 0) {
+            chatId = "vend" + quoteId;
+            _filterId = vendorId;
+        }
+        else {
+            chatId = quoteId;
+            _filterId = "0";
+        }
+        $('#chatPanel59').html('');
+        //$('#spanProdName').html('Chat with ' + customerName+', Product Name ' + productName);
+        enterChat(_filterId);
+    }
+
+    function enterChat(_filterId) {
+        //userId = 'qwe';
+        filterId = _filterId;
+        if (connId != "-100") {
+            connection.invoke("SendAll", connId, chatId, userId, filterId);
+            GetNotification();
+            $("#chatPanel59").hover(function () {
+                if (resetSeenMesgs == false) {
+                    resetSeenMesgs = true;
+                    connection.invoke("UpdateSeenMessages", userId, chatId);
+                    $('#notificationsCount').html('');
+                    notificationFlag = false;
+                    $('#unreadQuoteList').html('');
+                    GetNotification();
+                }
+            });
+        }
+        else {
+            setTimeout(function () {
+                enterChat(filterId)
+            }, 2000);
+        }
+    }
+
+    function copyToClipboard() {
+        debugger;
+        var selectedMessages = '';
+        var checkedVals = $('.cb-chat:checkbox:checked').map(function () {
+            selectedMessages = selectedMessages + ' ' + $("#" + this.id.replace('chk', 'msg')).html();
+        }).get();
+        var trimmed = selectedMessages.substring(1);
+
+        window.localStorage.setItem('copiedMsgs', trimmed);
+        //console.log(trimmed);
+        //copy(trimmed);
+    }
+
+    function copyFromClipboard() {
+        var copiedMsgs = window.localStorage.getItem('copiedMsgs');
+        $('#write_msg_box').val(copiedMsgs);
+        //window.localStorage.clear();
+    }
+
+    function copy(messageStr) {
+        let tmpElement = $('<textarea style="opacity:0;"></textarea>');
+        tmpElement.text(messageStr);
+        tmpElement.prependTo($('body')).focus().select();
+        document.execCommand("copy");
+        tmpElement.remove();
+    }
+
+    function enditChatMessage(id, text) {
+        editId = id;
+        $('#write_msg_box').val(text);
+        $('#btnSetNewMessage').show();
+    }
+
+    function setAsNewMessage() {
+        editId = '';
+        $('#write_msg_box').val('');
+        $('#btnSetNewMessage').hide();
+    }
+
+
+    function SendClickMessage() {
+        sendMessage($('#write_msg_box').val());
+        $('#write_msg_box').val('');
+    }
+
+
+    function sendMessage(message) {
+        if (connId != "-100") {
+            if (editId == '') {
+                if (message != null && message != '' && message.length > 0) {
+                    connection.invoke('Send', userId, message, filterId, connId, chatId);
+                }
+            }
+            else {
+                editMessage(editId, message);
+                editId = '';
+            }
+        }
+        else {
+            setTimeout(sendMessage, 2000);
+        }
+    }
+
+    function sendWelcomeMessage(user) {
+        connection.invoke('Send', 'system', user + ' joined the chat', connId, chatId);
+    };
+
+    function deleteMessage(id) {
+        connection.invoke('DeleteMessage', id);
+        connection.invoke("ReloadAll", connId, chatId, userId, filterId);
+    };
+
+    function reloadChat() {
+        $('#chatPanel59').html('');
+    }
+
+    function editMessage(id, text) {
+        connection.invoke('EditMessage', id, text);
+        connection.invoke("ReloadAll", connId, chatId, userId, filterId);
+    };
+
+    function updateChat(user, message, id, time, deleted) {
+
+        var otherUserClass = 'chat-message-container';
+        var myUserClass = 'chat-message-container my-message';
+
+        var otherUserTimeClass = 'time-left';
+        var myUserTimeClass = 'time-right';
+
+        var btnDelOtherUserClass = 'hide pl-3 pr-2';
+        var btnDelMyClass = 'hide pl-2 pr-2';
+
+        var deletedOtherUserClass = 'delete-message';
+        var deletedMyClass = 'delete-message delete-my-message';
+
+        var designClass = otherUserClass;
+        var designTimeClass = otherUserTimeClass;
+        var deleteMsgClass = deletedOtherUserClass;
+        var btnDelClass = btnDelOtherUserClass;
+        if (user == userId) {
+            designClass = myUserClass;
+            designTimeClass = myUserTimeClass;
+            deleteMsgClass = deletedMyClass;
+            btnDelClass = btnDelMyClass;
+        }
+
+        let delOnClick = 'onclick="deleteMessage(\'' + id + '\')"';
+        let shareOnClick = 'onclick="hideshowCheckBox(\'chat\')"';
+        //let editOnClick = '';
+        let editOnClick = 'onclick="enditChatMessage(\'' + id + '\',\'' + message + '\')"';
+        var deleteBtn = '<a><i class="fa fa-trash-alt oper-btn" ' + delOnClick + '> </i> </a>';
+        var editBtn = '<a><i class="fa fa-edit oper-btn" ' + editOnClick + '> </i> </a>';
+        var shareBtn = '<a><i class="fa fa-share-alt oper-btn" ' + shareOnClick + '> </i> </a>';
+
+        let operationBtn = '<div class="' + btnDelClass + '"> ' + deleteBtn + editBtn + shareBtn + '</div>';
+        let checkBoxBtn = '<input id="chkChat' + id + '" type="checkbox" class="checkbox hide-checkbox cb-chat oper-btn-cb"/>';
+        //let checkBoxBtn = '<input type="checkbox" class="checkbox hide-checkbox cb-chat oper-btn-cb"/>';
+
+        var otherUserText = '<div class="row pl-3 pr-3 pb-1"><div class="col-12"><div class="' + designClass + '"><span>' + message + '</span></div></div></div>';
+        var myUserText = '<div class="row pl-3 pr-3 pb-1"><div class="col-12"><div class="' + designClass + '">' + operationBtn + '<span id="msgChat' + id +'">' + message + '</span>' + checkBoxBtn +'</div></div></div>';
+
+        let messageText = otherUserText;
+        if (user == userId) {
+            messageText = myUserText;
+        }
+
+        if (deleted == "1") {
+            designClass = deletedOtherUserClass;
+            if (user == userId) {
+                designClass = deletedMyClass;
+            }
+
+            message = "This message is deleted";
+            messageText = '<div class="row pl-3 pr-3 pb-1"><div class="col-12"><div class="' + designClass + '"><span>' + message + '</span></div></div></div>';
+        }
+
+        let timeText = '<div class="row pl-3 pr-3 pb-1"><div class="col-12"><div class="' + designTimeClass + '">' + time+'</div></div></div>';
+        let chat = messageText + timeText;
+
+        $('#chatPanel59').append(chat);
+        scrollDown();
+    };
+
+    function scrollDown() {
+        var elem = document.getElementById('chatPanel59');
+        elem.scrollTop = elem.scrollHeight;
+    };
+
+    function archiveChat() {
+        let message = $('#chat')["0"].innerText;
+        let archivePath = $('#archivePath').val();
+        connection.invoke('ArchiveChat', archivePath, message);
+    };
+
+    function GetNotification() {
+
+        if (connId != "-100") {
+            if (userId != '0' && notificationFlag == false) {
+                notificationFlag = true;
+                connection.invoke('GetAllUnseenMessages', userId, connId, '1');
+            }
+            else {
+                document.getElementById("chatNotifications").style.display = "none";
+            }
+        }
+        else {
+            setTimeout(GetNotification, 2000);
+        }
+    }
+
+    function pushNotification(msgCount, chatId) {
+        $('#clientQuoteId').val('0');
+
+        if (msgCount != "0" && chatId != "0" && chatId != "vend0") {
+            $('#notificationsCount').html(msgCount);
+            $('#clientQuoteId').val(chatId);
+            var size = "10px";
+            if (msgCount.length == 1) {
+                size = "12px";
+            }
+            else if (msgCount.length == 2) {
+                size = "11px";
+            }
+            document.getElementById("notificationsCount").style.fontSize = size;
+        }
+    }
+
+    function addInQuoteList(qchatId) {
+        var quoteId = qchatId;
+        if (quoteId.includes("vend")) {
+            quoteId = quoteId.replace("vend", "");
+        }
+
+        if (quoteId != '0') {
+            var row = '<div class="p-3 container-box" style="margin-top:5px;">';
+            row += '<div class="row">';
+            row += '<div class="col-2 align-text-center">';
+            row += '<div class="round-chat-name-quote" onclick="GotoUnReadQuote(\'' + qchatId + '\')">';
+            row += '<a href="javascript:void(0);" style="color:white" onclick="GotoUnReadQuote(\'' + qchatId + '\')">Q</a>';
+            row += '</div></div>';
+            row += '<div class="col-8 align-text-left">';
+            row += '<span class="font-size-small" style="margin-top:10px;">Quote No : ' + quoteId + '</span>';
+            row += '</div></div></div>';
+
+            $('#unreadQuoteList').append(row);
+        }
+    }
+
+    function SendEmailToNotSignInUser(userIdsList) {
+
+        $("input:checkbox[name=cbFileList]:checked").each(function () {
+            downloadFileIds.push($(this).val());
+        });
+        var serverUrl = '@Url.Action("SendEmailToNotSignInUsers", "RequestQuote")';
+        var quoteId = '@Model.ChatId'
+        $.ajax({
+            url: serverUrl,
+            type: "GET",
+            data: { quoteId: quoteId, userIdsList: userIdsList},
+            traditional: true,
+            success: function (response) {
+            }
+        });
+    }
+
+</script>

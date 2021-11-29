@@ -1,0 +1,102 @@
+﻿@model HeaderLinksModel
+@using Nop.Core.Configuration
+@using Nop.Core.Domain.Common
+@using Nop.Core.Domain.Seo
+@using Nop.Services.Security
+@using Nop.Web.Framework.Events
+@using Nop.Core
+@using Nop.Web.Models.Common;
+@using Nop.Core.Events
+@using Nop.Core.Domain.Customers
+@using Nop.Core.Infrastructure
+@using Nop.Services.Configuration
+
+@inject IWorkContext workContext;
+
+@{
+    Customer customer = null;
+    if (Model.IsAuthenticated)
+    {
+        customer = await workContext.GetCurrentCustomerAsync();
+    }
+}
+<script src="/lib/browser/signalr.min.js"></script>
+
+<script type="text/javascript">
+    var userId = '@(customer == null ? 0 : customer.Id)';
+    var connId = '-100';
+    var msgCount = '';
+    var chatURL = '@T("signalR.Chat.URL")';
+    //var connection = new signalR.HubConnectionBuilder()
+    //    .withUrl('https://localhost:44378/chat')
+    //    .build();
+
+    var connection = new signalR.HubConnectionBuilder()
+        .withUrl(chatURL)
+        .build();
+
+    async function start() {
+        try {
+            await connection.start().then(function () {
+                connection.invoke("getConnectionId").then(function (connectionId) {
+                    connId = connectionId;
+                    console.log("SignalR Connected.");
+                });
+            });;
+        } catch (err) {
+            console.log(err);
+            setTimeout(start, 2000);
+        }
+    };
+
+    connection.onclose(async () => {
+        connId = "-100";
+        console.log("doscinnected, connecting again");
+        await start();
+    });
+
+    // Start the connection.
+    start();
+
+    connection.on('PushNotification', (msgCount, chatId) => {
+        pushNotification(msgCount, chatId);
+    });
+
+    var myInterval = setTimeout(GetNotification, 2000);
+
+
+
+    function GetNotification() {
+
+        if (connId != "-100") {
+            if (userId != '0') {
+                connection.invoke('GetAllUnseenMessages', userId, connId, '0');
+            }
+            else {
+                document.getElementById("chatNotifications").style.display = "none";
+            }
+        }
+        else {
+            setTimeout(GetNotification, 2000);
+        }
+    }
+
+    function pushNotification(msgCount, chatId) {
+        $('#clientQuoteId').val('0');
+
+        if (msgCount != "0" && chatId != "0" && chatId != "vend0") {
+            $('#notificationsCount').html(msgCount);
+            $('#clientQuoteId').val(chatId);
+            var size = "10px";
+            if (msgCount.length == 1) {
+                size = "12px";
+            }
+            else if (msgCount.length == 2) {
+                size = "11px";
+            }
+            document.getElementById("notificationsCount").style.fontSize = size;
+        }
+    }
+
+
+</script>

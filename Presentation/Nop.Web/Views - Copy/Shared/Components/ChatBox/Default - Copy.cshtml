@@ -1,0 +1,211 @@
+﻿@model ChatBoxModel
+<style>
+    .container-box {
+        background-color: #f9fafc;
+        border-style: solid;
+        border: 1px solid #dbe5ed;
+        border-radius: 20px;
+
+    }
+    .qq-upload-drop-area, .qq-upload-extra-drop-area {
+        background: #728fce !important;
+    }
+    .main-file-uploader:hover {
+        background: #9aacd5 !important;
+    }
+    .chat-message-container {
+        background-color: #afbbc6;
+        border-radius: 15px;
+        color: white;
+        font-weight: lighter;
+        padding: 5px 10px 0px 15px;
+        float: left !important;
+    }
+
+    .my-message {
+        background-color: #76c00d;
+        float: right !important;
+    }
+
+    chat-message-container::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    .time-right {
+        float: right;
+        color: #aaa;
+        font-size: small;
+    }
+
+    .time-left {
+        float: left;
+        color: #999;
+        font-size: small;
+    }
+
+    .bb {
+        border-bottom: 1px solid #dbe5ed;
+    }
+
+    .container-title {
+        color: #7d8285;
+    }
+
+    .type-message-container {
+        position: relative;
+        background-color: white;
+        border-radius: 30px;
+        margin: 10px 20px 20px 20px;
+    }
+
+    .input-msg-write input {
+        background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+        border: medium none;
+        color: #4c4c4c;
+        font-size: 15px;
+        min-height: 48px;
+        width: 100%;
+        outline: none;
+        padding: 20px;
+    }
+
+    .msg-send-btn {
+        background: #76c00d none repeat scroll 0 0;
+        border: medium none;
+        border-radius: 50%;
+        color: #fff;
+        cursor: pointer;
+        font-size: 17px;
+        height: 35px;
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        width: 35px;
+        display: inline-block;
+    }
+
+    .emoji-select-button {
+        background: White none repeat scroll 0 0;
+        border: medium none;
+        border-radius: 50%;
+        color: #aaa;
+        cursor: pointer;
+        font-size: 17px;
+        height: 35px;
+        position: absolute;
+        top: 5px;
+        width: 35px;
+        display: inline-block;
+    }
+
+    .attach-select-button {
+        background: White none repeat scroll 0 0;
+        border: medium none;
+        border-radius: 50%;
+        color: #aaa;
+        cursor: pointer;
+        font-size: 17px;
+        height: 35px;
+        position: absolute;
+        top: 5px;
+        right: 50px;
+        width: 35px;
+        display: inline-block;
+    }
+
+    container-title
+    .button-container {
+        width: 100%;
+        text-align: center;
+    }
+
+    .align-text-center {
+        text-align: center;
+    }
+
+    .align-text-right {
+        text-align: right;
+    }
+
+    .my-success-button {
+        background-color: #76c00d;
+        border-radius: 28px;
+        display: inline-block;
+        cursor: pointer;
+        color: #ffffff;
+        padding: 5px 30px;
+        text-decoration: none;
+        border: #fff;
+    }
+        .my-success-button:hover {
+            background-color: #a1e344;
+        }
+
+    .my-cancel-button {
+        background-color: #afbbc6;
+        border-radius: 28px;
+        display: inline-block;
+        cursor: pointer;
+        color: #ffffff;
+        padding: 5px 30px;
+        text-decoration: none;
+        border: #fff;
+    }
+        .my-cancel-button:hover {
+            background-color: #a1e344;
+        }
+</style>
+
+<div class="container-box">
+    <div class="container-title bb p-3">
+        <span> Chat with Franky Schmidth, Product Name One</span>
+    </div>
+
+    @*Customer*@
+    <div class="row pl-3 pr-3 pb-1">
+        <div class="col-12">
+            <div class="chat-message-container">
+                <p>Hello. How are you today?</p>
+            </div>
+        </div>
+    </div>
+    <div class="row pl-3 pr-3 pb-1">
+        <div class="col-12">
+            <div class="time-left">11:01</div>
+        </div>
+    </div>
+
+
+
+    @*User*@
+    <div class="row pl-3 pr-3 pb-1">
+        <div class="col-12">
+            <div class="chat-message-container my-message">
+                <p>Hey! I'm fine. Thanks for asking!</p>
+            </div>
+        </div>
+    </div>
+    <div class="row pl-3 pr-3 pb-1" >
+        <div class="col-12">
+            <div class="time-right">11:01</div>
+        </div>
+    </div>
+
+    @*TYPE Message*@
+    <div class="type-message-container">
+        <div class="row input-msg-write">
+            <div class="col-9">
+                <input type="text" class="write_msg" placeholder="Type a message" />
+            </div>
+            <div class="col-3 button-container">
+                <button class="attach-select-button"><i class="fa fa-paperclip"></i></button>
+                <button class="emoji-select-button" type="button"><i class="fa fa-smile" aria-hidden="true"></i></button>
+                <button class="msg-send-btn" type="button"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+            </div>
+
+        </div>
+    </div>
+
+</div>

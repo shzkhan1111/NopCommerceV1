@@ -1,0 +1,54 @@
+﻿@using Nop.Web.Models.Common
+@model ChatHeaderModel
+
+<div class="col-3 chat-head-title">
+    <div id="chat-head-icon">
+        @*<img src="~/images/messenger-icon.png" width="50" height="50" />*@
+    </div>
+    <div id="chat-head-title">
+        <span class="font-weight-bold font-size-larger" style="display:block">Quote Id : @Model.QuoteId</span>
+        <span class="font-size-small">Quate Date : @Model.QuoteDate</span>
+    </div>
+
+</div>
+
+<div class="col-6 ">
+    @if (Model.IsAdmin)
+    {
+        <div class="row align-text-center">
+            <div class="col-3"></div>
+            <div class="@(Model.CustomerFlag ? "col-2 square" : "col-2" )">     <a href="@("/Admin/Quote/Messenger?id="+Model.CustomerQuoteGuid+"&&isVendor=false")">Customer</a></div>
+            <div class="@(Model.CustomerFlag ? "col-2" : "col-2 square" )">     <a href="@("/Admin/Quote/Messenger?id="+Model.QuoteGuid+"&&isVendor=true")" id="vendorChatTab">Vendor</a></div>
+            <div class="col-2">     <a href="javascript:void(0);">Product</a></div>
+            @*<div class="col-2">     <a href="javascript:void(0);" onclick="ProductClick()">Product</a></div>*@
+            <div class="col-3"></div>
+        </div>
+    }
+</div>
+
+
+<div class="col-3 chat-head-title">
+    <div class="row">
+        <div class="col-2">
+            <div class="round-chat-name">@Model.Initials</div>
+        </div>
+        <div class="col-10">
+            <span>@Model.UserName</span><br />
+            <div class="font-size-small text-muted" style="display:block">
+                <span>@Model.CompanyName</span>
+                <span class="user-status">Online <i class="fa fa-chevron-down small"></i></span>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+
+<style>
+    .square {
+        border-radius: 150px;
+        outline: 1px solid black;
+    }
+</style>
+

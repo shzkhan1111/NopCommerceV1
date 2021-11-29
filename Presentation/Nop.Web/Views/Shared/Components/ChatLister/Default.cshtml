@@ -1,0 +1,167 @@
+﻿@model ChatListerModel
+@using Nop.Web.Factories
+
+
+@inject IVendorModelFactory _vendorFactory
+@inject ICustomerModelFactory _customerFactory
+@{
+    List<ForwardDetails> forwardList;
+    if (Model.CustomerFlag)
+        forwardList = await _customerFactory.PrepareCustomerChatListByCustomerQuoteAsync(Model.QuoteId);
+    else
+        forwardList = await _vendorFactory.PrepareVendorChatListByCustomerQuoteAsync(Model.QuoteId);
+}
+
+<div class="p-3 container-box">
+    <div class="row">
+        <div class="col-2 align-text-center">
+            <div>
+                <div class="round-chat-name">@Model.Initials.ToUpper()</div>
+            </div>
+        </div>
+        <div class="col-8 align-text-left">
+            <span class="font-size-small">@Model.UserName</span><br />
+            <div class="font-size-small text-muted" style="display:block">
+                @if (Model.IsAdmin)
+                {
+                    <span>Administrator</span>
+                }
+                else if (Model.CustomerFlag)
+                {
+                    <span>Customer</span>
+                }
+                else
+                {
+                    <span>Vendor</span>
+                }
+            </div>
+        </div>
+
+        @*<div class="col-2 align-text-center">
+                <span class="red new-message-count">1</span>
+            </div>*@
+    </div>
+
+</div>
+
+
+@if (Model.IsAdmin)
+{
+    @foreach (var obj in forwardList)
+    {
+
+
+        <div class="p-3 container-box" style="margin-top:10px;">
+            <div class="row">
+                <div class="col-2 align-text-center">
+                    @if (Model.UserId != obj.Id)
+                    {
+                        if (Model.CustomerFlag)
+                        {
+                            <div>
+                                <div class="round-chat-name">
+                                    <a href="@("/Messenger/Index?id=" + Model.CustomerQuoteGuid + "&&isVendor=false")" style="color:white">@obj.Name.Substring(0, 2)</a>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                <div class="round-chat-name">
+                                    <a href="@("/Messenger/Index?id=" + Model.QuoteGuid + "&&isVendor=false&&VendorId="+Model.UserId)" style="color:white">@obj.Name.Substring(0, 2)</a>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        if (Model.CustomerFlag)
+                        {
+                            <div>
+                                <div class="round-chat-name-selected">
+                                    <a href="@("/Messenger/Index?id=" + Model.CustomerQuoteGuid + "&&isVendor=true")" style="color:white">@obj.Name.Substring(0, 2)</a>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                <div class="round-chat-name-selected">
+                                    <a href="@("/Messenger/Index?id=" + Model.QuoteGuid + "&&isVendor=true&&VendorId="+Model.UserId)" style="color:white">@obj.Name.Substring(0, 2)</a>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+
+                <div class="col-8 align-text-left">
+                    <span class="font-size-small">@obj.Name</span><br />
+
+                    <div class="font-size-small text-muted" style="display:block">
+                        @if (Model.CustomerFlag)
+                        {
+                            <span>Customer</span>
+                        }
+                        else
+                        {
+                            <span>Vendor</span>
+                        }
+                    </div>
+                </div>
+
+                @*<div class="col-2 align-text-center">
+                        <span class="red new-message-count">1</span>
+                    </div>*@
+            </div>
+
+        </div>
+
+    }
+}
+
+<h2 style="margin-top:50px;font-size:15px">Unread Chats</h2>
+
+<div id="unreadQuoteList" style="overflow-y: scroll; height:310px;overflow-x: hidden;">
+    @*<div class="p-3 container-box" style="margin-top:5px;">
+        <div class="row">
+            <div class="col-2 align-text-center">
+                <div class="round-chat-name-quote">
+                    <a href="@("/Messenger/Index?id=" + Model.CustomerQuoteGuid + "&&isVendor=false")" style="color:white">Q</a>
+                </div>
+            </div>
+            <div class="col-8 align-text-left">
+                <span class="font-size-small" style="margin-top:10px;">Quote No : 1</span>
+            </div>
+        </div>
+    </div>*@
+
+</div>
+
+<script>
+    function GotoUnReadQuote(quoteId) {
+        if (quoteId != '0') {
+            var serverUrl = '@Url.Action("GetCustomerQuoteGuid", "RequestQuote")';
+            var vendor = false;
+            if (quoteId.includes("vend")) {
+                quoteId = quoteId.replace("vend", "");
+                serverUrl = '@Url.Action("GetVendorQuoteGuid", "RequestQuote")';
+                vendor = true;
+            }
+
+            $.ajax({
+                url: serverUrl,
+                type: "GET",
+                data: { QuoteId: quoteId },
+                success: function (response) {
+                    if (response.success) {
+                        location.href = "/Messenger/Index/" + response.quoteGuid;
+                    }
+                    else {
+
+                    }
+                }
+            });
+        }
+    }
+
+</script>

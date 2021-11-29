@@ -1,0 +1,191 @@
+﻿@using Nop.Services.Media
+@using Nop.Core.Domain.Media
+@using Nop.Web.Models.Common
+
+@model FileListerModel
+
+
+<div class="container-fluid">
+    <div class="row mt-10 mb-10">
+        @if (Model.IsAdmin)
+        {
+            <div style="font-size: x-large;" class="col-md-9"> File Share</div>
+            <a href="javascript:void(0);" style="font-size: x-large;" class="col-1" onclick="CheckSelectedFileCount()"> <i class="fa fa-share"></i> </a>
+            <a href="javascript:void(0);" style="font-size: x-large;" class="col-2" id="collapseAllFiles" onclick="collapseAllFiles()"> <i class="fa fa-caret-square-down"></i> </a>
+        }
+        else
+        {
+            <div style="font-size: x-large;" class="col-md-10"> File Share</div>
+            <a href="javascript:void(0);" style="font-size: x-large;" class="col-2" id="collapseAllFiles" onclick="collapseAllFiles()"> <i class="fa fa-caret-square-down"></i> </a>
+        }
+    </div>
+    <div id="file-list" style="display:block">
+        @foreach (var record in Model.DownloadList)
+        {
+            <div class="row mt-20" id="file-container">
+                <div class="col-md-1">
+                    <div style="text-align: center; vertical-align: middle;" >
+                        <input type="checkbox" name="cbFileList" class="oper-btn-cb" style="margin-left: -5px;" value="@record.Id" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <i class="fa fa-file-alt fa-2x"></i>
+                </div>
+                <div class="col-md-7" id="file-info">
+                    <div class="row w-100 font-larger font-bold text-muted" style="" title="@(record.Filename)">@(record.Filename)</div>
+                    <div class="row w-100 text-muted font-small" title="1-1-2011">Date : @(record.CreatedOn.Day +"-"+ record.CreatedOn.Month + "-" + record.CreatedOn.Year)</div>
+                    <div id="#file-info-c">
+                        <div class="row w-100 text-muted font-small" title="1-1-2011">Person : @record.CreatedBy</div>
+                        <div class="row w-100 text-muted">
+                            <a href="@(Url.Action("GetFileUpload", "Download", new {downloadId = record.DownloadGuid}))" class="p-lg-1">
+                                <i title="Download File" class="fas fa-download"></i>
+                            </a>
+                            @if (Model.IsAdmin || Model.UserId == record.AuthorId)
+                            {
+                                <a href="javascript:void(0);" onclick="hideAfterRemove(@(record.Id))" class="p-lg-1">
+                                    <i class="fas fa-trash" title="Remove File"></i>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <a href="javascript:void(0);" id="collapseFileInfo" onclick="collapseFileInfo();">
+                        <i class="fa fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+
+        }
+    </div>
+</div>
+
+<script asp-location="Footer">
+    function collapseAllFiles() {
+        var content = $("#file-list");
+        content.fadeToggle();
+        $("#collapseAllFiles > i").toggleClass("fa-caret-square-down fa-caret-square-up");
+    }
+
+    function collapseFileInfo() {
+        var fileInfo = $('#file-container #file-info #file-info-c');
+        console.log(fileInfo);
+        fileInfo.fadeToggle();
+    }
+
+    function hideAfterRemove(fileId) {
+        $.ajax({
+            url: '@Url.Action("RemoveFile", "Download")',
+            type: "GET",
+            data: { docId: parseInt(fileId) },
+            success: function (response) {
+                //alert(response.message);
+                $("#" + fileId + "downloadurl").html("");
+                $("#" + fileId + "remove").html("");
+                $("#" + fileId + "success").html("");
+                var myInterval = setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            }
+        });
+    }
+
+    function CheckSelectedFileCount() {
+        var count = 0;
+        $("input:checkbox[name=cbFileList]:checked").each(function () {
+            count++;
+        });
+
+        if (count > 0) {
+            showForwardList();
+        }
+    }
+</script>
+<style>
+
+    .text-muted {
+        font-size: small;
+        color: #777;
+    }
+
+    i.fa-file-alt {
+        display: inline-block;
+        border-radius: 60px;
+        box-shadow: 0 0 2px #888;
+        padding: .5em .6em;
+        background: #cecdcd77;
+    }
+
+    .attachment-icon {
+        display: inline-block;
+        border-radius: 60px;
+        box-shadow: 0 0 2px #888;
+        padding: .7em .8em;
+        background: #728FCE;
+        color: #fff;
+    }
+
+    .main-file-uploader {
+        display: inline-block;
+        border-radius: 60px;
+        box-shadow: 0 0 2px #888;
+        padding: .7em .8em;
+        background: #728FCE;
+        color: #fff;
+    }
+
+    .mt-20 {
+        margin-top: 20px;
+    }
+
+    .mb-10 {
+        margin-bottom: 10px;
+    }
+
+    .mt-10 {
+        margin-top: 10px;
+    }
+
+    .mr-10 {
+        margin-right: 10px;
+    }
+
+    .ml-10 {
+        margin-left: 10px;
+    }
+
+    .font-bold {
+        font-weight: bold;
+    }
+
+    .font-larger {
+        font-size: larger;
+    }
+
+    .font-small {
+        font-size: small;
+    }
+
+    /* width */
+    ::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+</style>
+
+
+

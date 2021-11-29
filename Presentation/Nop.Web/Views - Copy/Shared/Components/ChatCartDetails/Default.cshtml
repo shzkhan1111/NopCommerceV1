@@ -1,0 +1,556 @@
+﻿@using Nop.Core
+@using Nop.Core.Domain.Orders
+@model Nop.Web.Models.Quote.CustomerQuoteListModel
+
+
+<div class="container-box">
+    <div class="container-title bb pr-3 pl-3 pt-2 pb-2">
+        <div class="row">
+            <div class="col-9">
+                <span> Shopping Card Details for Qoute Reuest @(Model == null || Model.Quotes == null || Model.Quotes.Count == 0 ? "" : Model.Quotes[0].CustomQuoteNumber)</span><br>
+                <span>
+                    @(Model == null || Model.Quotes == null || Model.Quotes.Count == 0 ? "" : Model.Quotes[0].CustomerName),
+                    @(Model == null || Model.Quotes == null || Model.Quotes.Count == 0 ? "" : Model.Quotes[0].CompanyName)
+                </span>
+            </div>
+            <div class="col-3 align-text-right">
+                @if (Model.IsAdmin || Model.VendorId > 0)
+                {
+                    <a href="javascript:void(0);" onclick="ProductClick()">Add Products <i class="fa fa-cart-plus"></i></a>
+                }
+            </div>
+
+        </div>
+
+    </div>
+
+    <div style="overflow-y: scroll; height:400px;overflow-x: hidden;" class="well well-lg">
+        <div class="pt-4 pr-3 pl-3" id="divActiveProducts">
+            <table class="table-bordered align-text-center" id="activeProducts">
+                <tbody class="align-text-center" id="tbodyActiveProducts">
+                    <tr>
+                        <th width="10%"></th>
+                        <th width="20%">Products List</th>
+                        <th width="20%">SKU</th>
+                        <th width="20%">Quantity</th>
+                        <th width="14%">Price</th>
+                        <th width="8%"></th>
+                        <th width="8%"></th>
+                    </tr>
+                    @if (Model != null && Model.Quotes != null && Model.Quotes.Count > 0 && Model.Quotes[0].QuoteItems != null && Model.Quotes[0].QuoteItems.Count > 0)
+                    {
+                        @foreach (var detail in Model.Quotes[0].QuoteItems.Where(x => x.Deleted == false).ToList())
+                        {
+                            <tr id="@("trActive" + detail.Id)">
+                                <td>
+                                    <input type="checkbox" id="@("prodIdActive" + detail.Id)" style="width:20px;height:20px;" name="prodIdActive" value="@detail.Id">
+                                </td>
+                                <td><a href="javascript:void(0);" onclick="getProductChat('@detail.ProductId', '@detail.QuoteId', '@detail.ProductName', '@Model.Quotes[0].CustomerName', '@Model.VendorId')" style="font-size:12px;" id="@("prodNameActive" + detail.Id)">@detail.ProductName</a></td>
+                                <td><a href="javascript:void(0);" onclick="getProductChat('@detail.ProductId', '@detail.QuoteId', '@detail.ProductName', '@Model.Quotes[0].CustomerName', '@Model.VendorId')" style="font-size:12px;" id="@("skuActive" + detail.Id)">@detail.SKU </a></td>
+                                <td>
+                                    <input type="number" id="@("qtyActive" + detail.Id)" name="qty" value="@detail.Quantity">
+                                </td>
+                                @if (Model.IsAdmin == false && Model.CustomerId > 0)
+                                {
+                                    <td>
+                                        <input type="number" id="@("priceActive" + detail.Id)" name="@("priceActive" + detail.Id)" value="@System.Math.Round(detail.UnitPriceInclTax,2)" disabled>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        <input type="number" id="@("priceActive" + detail.Id)" name="@("priceActive" + detail.Id)" value="@System.Math.Round(detail.UnitPriceInclTax,2)">
+                                    </td>
+                                }
+
+
+
+
+                                <td>
+                                    <a href="javascript:void(0);" onclick="DeleteQuoteItem(@detail.Id, '@detail.ProductId', '@detail.QuoteId', '@detail.ProductName', '@Model.Quotes[0].CustomerName', '@Model.VendorId')"><i class="fa fa-trash"></i></a>
+                                </td>
+                                <td>
+                                    <a href="javascript:void(0);" onclick="UpdateQuoteItemQuantity(@detail.Id, '@Model.VendorId')"><i class="fa fa-save"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pt-4 pr-3 pl-3" id="divDeletedProducts">
+            <table class="table-bordered" id="deletedProducts">
+                <thead>
+                    <tr>
+                        <th colspan="6" class="p-2">Deleted Products</th>
+                    </tr>
+                </thead>
+                <tbody class="align-text-center" id="tbodyDeletedProducts">
+
+                    @if (Model != null && Model.Quotes != null && Model.Quotes.Count > 0 && Model.Quotes[0].QuoteItems != null
+         && Model.Quotes[0].QuoteItems.Count > 0 && Model.Quotes[0].QuoteItems.Where(x => x.Deleted == true).ToList().Count > 0)
+                    {
+                        @foreach (var detail in Model.Quotes[0].QuoteItems.Where(x => x.Deleted == true).ToList())
+                        {
+                            <tr id="@("trDeleted" + detail.Id)">
+                                <td width="10%">
+                                    <input type="checkbox" id="@("prodIdDeleted" + detail.Id)" name="@("prodId" + detail.Id)" value="@detail.Id">
+                                </td>
+                                <td width="20%"><a href="javascript:void(0);" onclick="getProductChat('@detail.ProductId', '@detail.QuoteId', '@detail.ProductName', '@Model.Quotes[0].CustomerName', '@Model.VendorId')" style="font-size:12px;" id="@("prodNameDeleted" + detail.Id)">@detail.ProductName</a></td>
+                                <td width="20%"><a href="javascript:void(0);" onclick="getProductChat('@detail.ProductId', '@detail.QuoteId', '@detail.ProductName', '@Model.Quotes[0].CustomerName', '@Model.VendorId')" style="font-size:12px;" id="@("skuDeleted" + detail.Id)">@detail.SKU </a></td>
+                                <td width="20%">
+                                    <input type="number" id="@("qtyDeleted" + detail.Id)" name="qty" value="@detail.Quantity">
+                                </td>
+                                @if (Model.IsAdmin == false && Model.CustomerId > 0)
+                                {
+                                    <td width="14%">
+                                        <input type="number" id="@("priceDeleted" + detail.Id)" name="@("priceDeleted" + detail.Id)" value="@System.Math.Round(detail.UnitPriceInclTax,2)" disabled>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td width="14%">
+                                        <input type="number" id="@("priceDeleted" + detail.Id)" name="@("priceDeleted" + detail.Id)" value="@System.Math.Round(detail.UnitPriceInclTax,2)">
+                                    </td>
+                                }
+
+
+                                <td width="16%">
+                                    <a href="javascript:void(0);" onclick="RestoreQuoteItem(@detail.Id, '@detail.ProductId', '@detail.QuoteId', '@detail.ProductName', '@Model.Quotes[0].CustomerName', '@Model.VendorId')"><i class="fa fa-undo"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+
+
+            </table>
+        </div>
+
+        @if ((Model.IsAdmin && (Model.Quotes[0].QuoteStatus == ((int)OrderStatus.Drafted).ToString()
+                                  || Model.Quotes[0].QuoteStatus == ((int)OrderStatus.Cancelled).ToString()))
+                      || (Model.CustomerId > 0 && (Model.Quotes[0].QuoteStatus == ((int)OrderStatus.MarkedOfficial).ToString()
+                          || Model.Quotes[0].QuoteStatus == ((int)OrderStatus.Drafted).ToString())))
+        {
+            <div id="tbl3" class="pt-4 pr-3 pl-3">
+                <table class="table-bordered" id="tblAdditionalDetails">
+                    <thead>
+                        <tr>
+                            <td class="p-2">
+                                Further Information / Details
+                                <a href="javascript:void(0);" onclick="AddAdditionalDetail('@Model.Quotes[0].Id')"><i class="fa fa-plus"></i></a>
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody class="align-text-center">
+
+                        @foreach (var mapping in Model.Quotes[0].QuoteAttributeList)
+                        {
+                            <tr>
+                                <th width="50%" contenteditable="true">
+                                    @mapping.Name
+                                </th>
+                                <td width="50%" contenteditable="true">
+                                    @mapping.Value
+                                    <input type="hidden" class="inp-quote-id" value="@mapping.Id">
+                                    <input type="hidden" class="inp-quote-att-id" value="@mapping.AttributeId">
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        }
+
+        @if (Model.IsAdmin && Model.CustomerId > 0 && Model.Quotes[0].QuoteStatus == ((int)OrderStatus.Drafted).ToString())
+        {
+            <div class="row pt-4 pr-3 pl-3 pb-4">
+                <div class="col-4"></div>
+                <div class="col-8 align-text-right">
+                    <button class="my-cancel-button" onclick="UpdateQuoteStatus('@Model.Quotes[0].Id', 50)"> SAVE DRAFT</button>
+                    <button class="my-success-button" onclick="UpdateQuoteStatus('@Model.Quotes[0].Id', 60)"> SEND OFFICIAL RESPONSE</button>
+                </div>
+            </div>
+        }
+
+        @if (Model.IsAdmin && Model.CustomerId > 0 && Model.Quotes[0].QuoteStatus == ((int)OrderStatus.MarkedOfficial).ToString())
+        {
+            <div class="row pt-4 pr-3 pl-3 pb-4">
+                <div class="col-4"></div>
+                <div class="col-8 align-text-right">
+                    <button class="my-cancel-button" onclick="UpdateQuoteStatus('@Model.Quotes[0].Id', 50)"> UNSENT OFFICIAL RESPONSE</button>
+                </div>
+            </div>
+        }
+
+        @if (!Model.IsAdmin && Model.CustomerId > 0 && Model.Quotes[0].QuoteStatus == ((int)OrderStatus.MarkedOfficial).ToString())
+        {
+            <div class="row pt-4 pr-3 pl-3 pb-4">
+                <div class="col-8"></div>
+                <div class="col-4 align-text-right">
+                    <button class="my-cancel-button" onclick="UpdateQuoteStatus('@Model.Quotes[0].Id', 50)"> CANCEL</button>
+                    <button class="my-success-button" onclick="UpdateQuoteStatus('@Model.Quotes[0].Id', 30)"> APPROVE</button>
+                </div>
+            </div>
+        }
+
+        @if (Model.IsAdmin || Model.VendorId > 0)
+        {
+            if (Model.CustomerId > 0 && (Model.Quotes[0].QuoteStatus == ((int)OrderStatus.Pending).ToString()
+                || Model.Quotes[0].QuoteStatus == ((int)OrderStatus.Cancelled).ToString()
+                || Model.Quotes[0].QuoteStatus == ((int)OrderStatus.Processing).ToString()))
+            {
+                <div class="row pt-4 pr-3 pl-3 pb-4">
+                    <div class="col-8"></div>
+                    <div class="col-4 align-text-right">
+                        <button class="my-success-button" onclick="CreateVendorQuote(@Model.Quotes[0].Id)"> CHAT WITH VENDOR</button>
+                    </div>
+                </div>
+            }
+
+            if (Model.IsAdmin && Model.VendorId > 0)
+            {
+                <div class="row pt-4 pr-3 pl-3 pb-4">
+                    <div class="col-8"></div>
+                    <div class="col-4 align-text-right">
+                        <button class="my-success-button" onclick="CopyResponseToCustomer()"> COPY RESPONSE</button>
+                        @*<button class="my-success-button"> PROCEED</button>*@
+                    </div>
+                </div>
+            }
+        }
+
+    </div>
+</div>
+
+<script>
+
+    var productIds = [];
+    $(document).ready(function () {
+        ShowHideTable('activeProducts', 'divActiveProducts');
+        ShowHideTable('deletedProducts', 'divDeletedProducts');
+
+        var productId = 0;
+        var producName = 0;
+        productId = '@(Model.Quotes[0].QuoteItems.Where(x => x.Deleted == false).Count() > 0 ?
+            @Model.Quotes[0].QuoteItems.Where(x => x.Deleted == false).ToList()[0].ProductId : 0
+        )';
+
+        producName = '@(Model.Quotes[0].QuoteItems.Where(x => x.Deleted == false).Count() > 0 ?
+            @Model.Quotes[0].QuoteItems.Where(x => x.Deleted == false).ToList()[0].ProductName : ""
+        )';
+
+        var myInterval = setTimeout(function () {
+            getProductChat(productId,
+                '@Model.Quotes[0].Id', producName, '@Model.Quotes[0].CustomerName', '@Model.VendorId');
+        }, 3000);
+
+    });
+
+    function DeleteQuoteItem(quoteItemId, productId, quoteId, productName, customerName, vendorId) {
+        var serverUrl = '@Url.Action("DeleteCustomerQuoteItem", "RequestQuote")';
+        if (vendorId > 0) {
+            serverUrl = '@Url.Action("DeleteVendorQuoteItem", "RequestQuote")';
+        }
+
+        var rowCount = GetTableRowCount('activeProducts');
+        if (rowCount > 2) {
+            $.ajax({
+                url: serverUrl,
+                type: "POST",
+                data: { quoteItemId: parseInt(quoteItemId) },
+                success: function (response) {
+                    if (response.success) {
+                        var clickData = getClickDataString(productId, quoteId, productName, customerName, vendorId);
+                        AddDeletedProducts('deletedProducts', 'activeProducts', 'trActive' + quoteItemId, quoteItemId, clickData);
+                        displayPopupNotification(response.message, 'success', 3000);
+                    }
+                    else {
+                        displayPopupNotification(response.message, 'error', 3000);
+                    }
+                }
+            });
+        }
+    }
+
+    function UpdateQuoteItemQuantity(quoteItemId, vendorId) {
+        var quantity = $("#qtyActive" + quoteItemId).val();
+        var price = $("#priceActive" + quoteItemId).val();
+
+        var serverUrl = '@Url.Action("UpdateCustomerQuoteItemQunatity", "RequestQuote")';
+        if (vendorId > 0) {
+            serverUrl = '@Url.Action("UpdateVendorQuoteItemQunatity", "RequestQuote")';
+        }
+
+        $.ajax({
+            url: serverUrl,
+            type: "POST",
+            data: { quoteItemId: parseInt(quoteItemId), quantity: parseInt(quantity), price: parseFloat(price)  },
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                    displayPopupNotification(response.message, 'success', 3000);
+                }
+                else {
+                    displayPopupNotification(response.message, 'error', 3000);
+                }
+            }
+        });
+    }
+
+    function RestoreQuoteItem(quoteItemId, productId, quoteId, productName, customerName, vendorId) {
+        var serverUrl = '@Url.Action("RestoreCustomerQuoteItemId", "RequestQuote")';
+        if (vendorId > 0) {
+            serverUrl = '@Url.Action("RestoreVendorQuoteItemId", "RequestQuote")';
+        }
+
+        $.ajax({
+            url: serverUrl,
+            type: "POST",
+            data: { quoteItemId: parseInt(quoteItemId) },
+            success: function (response) {
+                if (response.success) {
+                    var clickData = getClickDataString(productId, quoteId, productName, customerName, vendorId);
+                    AddActiveProducts('activeProducts', 'deletedProducts', 'trDeleted' + quoteItemId, quoteItemId, clickData);
+                    displayPopupNotification(response.message, 'success', 3000);
+                }
+                else {
+                    displayPopupNotification(response.message, 'error', 3000);
+                }
+            }
+        });
+    }
+
+    function getClickDataString(productId, quoteId, productName, customerName, vendorId) {
+        var str = '\'' + productId + '\', \'' + quoteId + '\', \'' + productName + '\', \'' + customerName + '\', \'' + vendorId + '\'';
+        return str;
+    }
+
+
+    function getOnClickData(clickDataString) {
+        //var clickStr = getClickDataStrin(productId, quoteId, productName, customerName);
+        var clickStr = 'onclick="getProductChat(' + clickDataString+')"';
+        //var clickStr = 'onclick="getProductChat("' + productId.trim() + '","' + quoteId + '","' + productName + '","' + customerName + '")"';
+        return clickStr;
+    }
+
+    function RefreshPartialView() {
+        $.get('/ChatCartDetailsViewComponent/InvokeAsync', function (data) {
+            $('#quoteContainer').html(data);
+        });
+    }
+
+    function DeleteRowFromTable(tableId, rowId) {
+        $("tr#" + rowId).remove();
+    }
+
+    function AddDeletedProducts(activeTableId, deletedTableId, rowId, quoteItemId, clickDataString) {
+        var rowCount = GetTableRowCount('activeProducts');
+        if (rowCount > 2) {
+
+            var productName = $('#prodNameActive' + quoteItemId).text();
+            var sku = $('#skuActive' + quoteItemId).text();
+            var qty = $('#qtyActive' + quoteItemId).val();
+            var price = $('#priceActive' + quoteItemId).val();
+            var clickData = getOnClickData(clickDataString);
+            var disabledClass = getPriceDisbleClass();
+
+            var cehckboxTD = '<td width="10%"><input type="checkbox" style="width:20px;height:20px;" id="prodIdDeleted' + quoteItemId + '" name="prodIdDeleted" value="' + quoteItemId + '"></td>'
+            var productTD = '<td width="20%"><a href="javascript:void(0);" ' + clickData + ' style="font-size:12px;" id="prodNameDeleted' + quoteItemId + '">' + productName + '</a></td>'
+            var skuTD = '<td width="20%"><a href="javascript:void(0);" ' + clickData + ' style="font-size:12px;" id="skuDeleted' + quoteItemId + '">' + sku + '</a></td>'
+            var qtyTD = '<td width="20%"><input type="number" id="qtyDeleted' + quoteItemId + '" name="qty" value="' + qty + '"></td>'
+            var priceTD = '<td width="20%"><input type="number" id="priceDeleted' + quoteItemId + '" name="price" value="' + price + '" ' + disabledClass+'></td>';
+            var restoreTD = '<td width="16%"><a href="javascript:void(0);" onclick="RestoreQuoteItem(' + quoteItemId + ',' + clickDataString + ')"><i class="fa fa-undo"></i></a></td>';
+
+            var newRowContent = '<tr id="trDeleted' + quoteItemId + '">' + cehckboxTD + productTD + skuTD + qtyTD + priceTD + restoreTD + '</tr>';
+            AddRowInTable(newRowContent, activeTableId);
+            DeleteRowFromTable(deletedTableId, rowId);
+            ShowHideTable('activeProducts', 'divActiveProducts');
+            ShowHideTable('deletedProducts', 'divDeletedProducts');
+        }
+    }
+
+    function AddActiveProducts(activeTableId, deletedTableId, rowId, quoteItemId, clickDataString) {
+        var productName = $('#prodNameDeleted' + quoteItemId).text();
+        var sku = $('#skuDeleted' + quoteItemId).text();
+        var qty = $('#qtyDeleted' + quoteItemId).val();
+        var price = $('#priceDeleted' + quoteItemId).val();
+        var clickData = getOnClickData(clickDataString);
+        var disabledClass = getPriceDisbleClass();
+
+        var cehckboxTD = '<td><input type="checkbox" style="width:20px;height:20px;" id="prodIdActive' + quoteItemId + '" name="prodIdActive" value="' + quoteItemId + '"></td>'
+        var productTD = '<td><a href="javascript:void(0);" ' + clickData + ' style="font-size:12px;" id="prodNameActive' + quoteItemId + '">' + productName + '</a></td>'
+        var skuTD = '<td><a href="javascript:void(0);" ' + clickData + ' style="font-size:12px;" id="skuActive' + quoteItemId + '">' + sku + '</a></td>'
+        var qtyTD = '<td><input type="number" id="qtyActive' + quoteItemId + '" name="qty" value="' + qty + '"></td>'
+        var priceTD = '<td><input type="number" id="priceActive' + quoteItemId + '" name="qty" value="' + price + '"' + disabledClass +'></td>'
+        var deletedTD = '<td><a href="javascript:void(0);" onclick="DeleteQuoteItem(' + quoteItemId + ')"><i class="fa fa-trash"></i></a></td>';
+        var savedTD = '<td><a href="javascript:void(0);" onclick="UpdateQuoteItemQuantity(' + quoteItemId + ',' + clickDataString +')"><i class="fa fa-save"></i></a></td>';
+
+        var newRowContent = '<tr id="trActive' + quoteItemId + '">' + cehckboxTD + productTD + skuTD + qtyTD + priceTD + deletedTD + savedTD + '</tr>';
+
+        AddRowInTable(newRowContent, activeTableId);
+        DeleteRowFromTable(deletedTableId, rowId);
+        ShowHideTable('activeProducts', 'divActiveProducts');
+        ShowHideTable('deletedProducts', 'divDeletedProducts');
+    }
+
+    function getPriceDisbleClass() {
+        var customerId = '@Model.CustomerId';
+        var isAdmin = '@Model.IsAdmin';
+        var disabledClass = "";
+        if (parseInt(customerId) > 0 && isAdmin != 'True') {
+            disabledClass = "disabled";
+        }
+
+        return disabledClass;
+    }
+
+    function AddRowInTable(newRowContent, tableId) {
+        var tblString = "#" + tableId + " tbody";
+        $(tblString).append(newRowContent);
+    }
+
+    function GetTableRowCount(tableId) {
+        var tblString = "#" + tableId + " tr";
+        return $(tblString).length;
+    }
+
+    function ShowHideTable(tableId, divId) {
+        var tblString = "#" + tableId + " tr";
+        var rowCount = $(tblString).length;
+        rowCount = rowCount - 1;
+        if (rowCount > 0) {
+            document.getElementById(divId).style.display = "block";
+        }
+        else {
+            document.getElementById(divId).style.display = "none";
+        }
+    }
+
+    function CreateVendorQuote(customerQuoteId) {
+
+        productIds = [];
+        $("input:checkbox[name=prodIdActive]:checked").each(function () {
+            productIds.push($(this).val());
+        });
+
+        $.ajax({
+            url: '@Url.Action("CreateVendorQuotes", "RequestQuote")',
+            type: "POST",
+            data: { quoteItemId: productIds, quoteId: parseInt(customerQuoteId) },
+            success: function (response) {
+                if (response.success) {
+                    $("#vendorChatTab").click();
+                    location.reload();
+                    displayPopupNotification(response.message, 'success', 3000);
+                }
+                else {
+                    displayPopupNotification(response.message, 'error', 3000);
+                }
+            }
+        });
+    }
+
+    function CopyResponseToCustomer() {
+        productIds = [];
+        $("input:checkbox[name=prodIdActive]:checked").each(function () {
+            productIds.push($(this).val());
+        });
+        var serverUrl = '@Url.Action("CopyResponseToCustomer", "RequestQuote")';
+
+
+        $.ajax({
+            url: serverUrl,
+            type: "POST",
+            data: { vendorQuoteItemIds: productIds },
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                    displayPopupNotification(response.message, 'success', 3000);
+                }
+                else {
+                    displayPopupNotification(response.message, 'error', 3000);
+                }
+            }
+        });
+    }
+
+    function AddAdditionalDetail(quoteId) {
+        var row = '<tr><th contenteditable="true" width="50%">ADDITIONAL DETAIL</th><td contenteditable="true" width="50%">ADDITIONAL DETAIL <input type="hidden" class="inp-quote-id" value="0"> <input type="hidden" class="inp-quote-att-id" value="0"></td></tr>';
+        AddRowInTable(row, 'tblAdditionalDetails');
+
+        //ReadyPostData(quoteId);
+    }
+
+    function PostAdditionalDetails(quoteId) {
+        var mappingIds = [];
+        var attributesIds = [];
+        var attributeList = [];
+
+        $(".inp-quote-id").each(function () {
+            mappingIds.push($(this).val());
+
+        });
+
+        $(".inp-quote-att-id").each(function () {
+            attributesIds.push($(this).val());
+        });
+
+        var count = 0;
+        $("#tblAdditionalDetails > tbody > tr").each(function () {
+
+            var name = $(this).find('th').eq(0).text();
+            var value = $(this).find('td').eq(0).text();
+            var attribute = {
+                Id: mappingIds[count],
+                AttributeId: attributesIds[count],
+                Name: name.trim(),
+                Value: value.trim()
+            };
+            attributeList.push(attribute);
+            //attributeList[count] = attribute;
+            count++;
+        });
+
+        $.ajax({
+            url: '@Url.Action("AddAttributesToQuote", "RequestQuote")',
+            type: "POST",
+            data: { attributeList: attributeList, QuoteId: parseInt(quoteId) },
+            success: function (response) {
+                if (response.success) {
+                    $("#vendorChatTab").click();
+                    displayPopupNotification(response.message, 'success', 3000);
+                }
+                else {
+                    displayPopupNotification(response.message, 'error', 3000);
+                }
+            }
+        });
+    }
+
+    function UpdateQuoteStatus(quoteId, status) {
+
+        if (status == '@((int)OrderStatus.MarkedOfficial)' || status == '@((int)OrderStatus.Drafted)') {
+            PostAdditionalDetails(quoteId);
+        }
+
+        $.ajax({
+            url: '@Url.Action("UpdateQuoteStatus", "RequestQuote")',
+            type: "POST",
+            data: { QuoteId: parseInt(quoteId), Status: parseInt(status) },
+            success: function (response) {
+                if (response.success) {
+                    $("#vendorChatTab").click();
+                    location.reload();
+                    displayPopupNotification(response.message, 'success', 3000);
+                }
+                else {
+                    displayPopupNotification(response.message, 'error', 3000);
+                }
+            }
+        });
+    }
+
+</script>

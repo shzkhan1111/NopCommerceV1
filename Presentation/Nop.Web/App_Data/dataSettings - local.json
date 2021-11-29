@@ -1,0 +1,6 @@
+﻿{
+  "DataConnectionString": "Data Source=DESKTOP-B7NP3HM\\SQLEXPRESS;Initial Catalog=NopCommerce;Integrated Security=True;Persist Security Info=False",
+  "DataProvider": "sqlserver",
+  "SQLCommandTimeout": null,
+  "RawDataSettings": {}
+}

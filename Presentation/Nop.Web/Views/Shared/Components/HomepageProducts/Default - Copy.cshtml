@@ -1,0 +1,294 @@
+﻿@model IList<ProductOverviewModel>
+@if (Model.Count > 0)
+{
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/bootstrap/js/bootstrap.min.js");
+    Html.AddCssFileParts(ResourceLocation.Footer, "~/lib_npm/bootstrap/css/bootstrap.min.css");
+    Html.AddCssFileParts(ResourceLocation.Footer, "~/lib_npm/@fortawesome/fontawesome-free/css/all.min.css");
+
+<div class="product-grid home-page-product-grid">
+    <div class="row">
+        <div class="col-3">
+            <div class="title">
+                <strong>@T("Homepage.Products")</strong>
+            </div>
+
+        </div>
+        <div class="col-9">
+            <div class="title">
+                <strong>Trending</strong>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="item-grid">
+                @foreach (var item in Model)
+                {
+                    if (!item.IsTrending)
+                    {
+                        <div class="item-box">
+                            @await Html.PartialAsync("_ProductBox", item)
+                        </div>
+                    }
+                }
+            </div>
+
+        </div>
+    </div>
+ 
+</div>
+}
+
+<div class="row">
+    <div class="col-4 nopadding"> 
+    <img class="base-img" src="~/images/main.PNG"/>
+    </div>
+
+    <div class="col-8">
+
+        <div class="row">
+            <div class="col-6 bottom-padding left-padding">
+                <div class="row subContainer">
+                    <div class="col-6">
+                        <img  class="sub-img" src="~/images/sub1.PNG" />
+                    </div>
+                    <div class="col-4">
+                        <br />
+                        
+                        <div style="font-size:small; font-weight:bold">Hilti Hand Drill</div>
+                        <div style="font-size:x-small;">Item Weight : 5 kg</div>
+                        <div style="font-size: x-small;">Wattage : 650 W </div>
+                        <div style="font-size: x-small; font-weight: bold; color: #d35a31;">$ 210.00 </div>
+                        <div>
+                            <span class="fa fa-arrows-alt-h"></span>
+                            <span class="fa fa-heart"></span>
+                            <span class="fa fa-shopping-cart" style="color: #d35a31;"></span>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div> <span class="fa fa-ellipsis-v"></span></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-6 bottom-padding left-padding"> 
+                <div class="row subContainer">
+                    <div class="col-6">
+                        <img class="sub-img" src="~/images/sub4.PNG" />
+                    </div>
+                    <div class="col-4">
+                        <br />
+
+                        <div style="font-size:small; font-weight:bold">Hilti Hand Drill</div>
+                        <div style="font-size:x-small;">Item Weight : 5 kg</div>
+                        <div style="font-size: x-small;">Wattage : 650 W </div>
+                        <div style="font-size: x-small; font-weight: bold; color: #d35a31;">$ 210.00 </div>
+                        <div>
+                            <span class="fa fa-arrows-alt-h"></span>
+                            <span class="fa fa-heart"></span>
+                            <span class="fa fa-shopping-cart" style="color: #d35a31;"></span>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div> <span class="fa fa-ellipsis-v"></span></div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6  left-padding">
+                <div class="row subContainer">
+                    <div class="col-6">
+                        <img class="sub-img" src="~/images/sub2.PNG" />
+                    </div>
+                    <div class="col-4">
+                        <br />
+
+                        <div style="font-size:small; font-weight:bold">Hilti Hand Drill</div>
+                        <div style="font-size:x-small;">Item Weight : 5 kg</div>
+                        <div style="font-size: x-small;">Wattage : 650 W </div>
+                        <div style="font-size: x-small; font-weight: bold; color: #d35a31;">$ 210.00 </div>
+                        <div>
+                            <span class="fa fa-arrows-alt-h"></span>
+                            <span class="fa fa-heart"></span>
+                            <span class="fa fa-shopping-cart" style="color: #d35a31;"></span>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div> <span class="fa fa-ellipsis-v"></span></div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-6 left-padding">
+              <div class="row subContainer">
+                    <div class="col-6">
+                        <img  class="sub-img" src="~/images/sub3.PNG" />
+                    </div>
+                    <div class="col-4">
+                        <br />
+                        
+                        <div style="font-size:small; font-weight:bold">Hilti Hand Drill</div>
+                        <div style="font-size:x-small;">Item Weight : 5 kg</div>
+                        <div style="font-size: x-small;">Wattage : 650 W </div>
+                        <div style="font-size: x-small; font-weight: bold; color: #d35a31;">$ 210.00 </div>
+                        <div>
+                            <span class="fa fa-arrows-alt-h"></span>
+                            <span class="fa fa-heart"></span>
+                            <span class="fa fa-shopping-cart" style="color: #d35a31;"></span>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div> <span class="fa fa-ellipsis-v"></span></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<div class="row pt-lg-5 pb-lg-5">
+    <div class="col-4 nopadding">
+        <img class="base-img" src="~/images/main.PNG" />
+    </div>
+
+    <div class="col-8">
+
+        <div class="row">
+            <div class="col-6 bottom-padding left-padding">
+                <div class="row subContainer">
+                    <div class="col-6">
+                        <img class="sub-img" src="~/images/sub1.PNG" />
+                    </div>
+                    <div class="col-4">
+                        <br />
+
+                        <div style="font-size:small; font-weight:bold">Hilti Hand Drill</div>
+                        <div style="font-size:x-small;">Item Weight : 5 kg</div>
+                        <div style="font-size: x-small;">Wattage : 650 W </div>
+                        <div style="font-size: x-small; font-weight: bold; color: #d35a31;">$ 210.00 </div>
+                        <div>
+                            <span class="fa fa-arrows-alt-h"></span>
+                            <span class="fa fa-heart"></span>
+                            <span class="fa fa-shopping-cart" style="color: #d35a31;"></span>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div> <span class="fa fa-ellipsis-v"></span></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-6 bottom-padding left-padding">
+                <div class="row subContainer">
+                    <div class="col-6">
+                        <img class="sub-img" src="~/images/sub1.PNG" />
+                    </div>
+                    <div class="col-4">
+                        <br />
+
+                        <div style="font-size:small; font-weight:bold">Hilti Hand Drill</div>
+                        <div style="font-size:x-small;">Item Weight : 5 kg</div>
+                        <div style="font-size: x-small;">Wattage : 650 W </div>
+                        <div style="font-size: x-small; font-weight: bold; color: #d35a31;">$ 210.00 </div>
+                        <div>
+                            <span class="fa fa-arrows-alt-h"></span>
+                            <span class="fa fa-heart"></span>
+                            <span class="fa fa-shopping-cart" style="color: #d35a31;"></span>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div> <span class="fa fa-ellipsis-v"></span></div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6  left-padding">
+                <div class="row subContainer">
+                    <div class="col-6">
+                        <img class="sub-img" src="~/images/sub1.PNG" />
+                    </div>
+                    <div class="col-4">
+                        <br />
+
+                        <div style="font-size:small; font-weight:bold">Hilti Hand Drill</div>
+                        <div style="font-size:x-small;">Item Weight : 5 kg</div>
+                        <div style="font-size: x-small;">Wattage : 650 W </div>
+                        <div style="font-size: x-small; font-weight: bold; color: #d35a31;">$ 210.00 </div>
+                        <div>
+                            <span class="fa fa-arrows-alt-h"></span>
+                            <span class="fa fa-heart"></span>
+                            <span class="fa fa-shopping-cart" style="color: #d35a31;"></span>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div> <span class="fa fa-ellipsis-v"></span></div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-6 left-padding">
+                <div class="row subContainer">
+                    <div class="col-6">
+                        <img class="sub-img" src="~/images/sub1.PNG" />
+                    </div>
+                    <div class="col-4">
+                        <br />
+
+                        <div style="font-size:small; font-weight:bold">Hilti Hand Drill</div>
+                        <div style="font-size:x-small;">Item Weight : 5 kg</div>
+                        <div style="font-size: x-small;">Wattage : 650 W </div>
+                        <div style="font-size: x-small; font-weight: bold; color: #d35a31;">$ 210.00 </div>
+                        <div>
+                            <span class="fa fa-arrows-alt-h"></span>
+                            <span class="fa fa-heart"></span>
+                            <span class="fa fa-shopping-cart" style="color: #d35a31;"></span>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div> <span class="fa fa-ellipsis-v"></span></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<style>
+    .nopadding {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .bottom-padding {
+        padding-bottom: 2px;
+    }
+    .left-padding {
+        border-right: 2px;
+    }
+    .subContainer {
+        background-color: white;
+        height:100%;
+    }
+    .base-img {
+       height:334px;
+       width : 336px;
+    }
+    .sub-img {
+        height: 166px;
+        width: 157px;
+    }
+    </style>

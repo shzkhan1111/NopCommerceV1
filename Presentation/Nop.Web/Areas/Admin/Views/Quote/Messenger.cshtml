@@ -1,0 +1,226 @@
+﻿@using Nop.Core.Configuration
+@using Nop.Core.Domain.Common
+@using Nop.Core.Domain.Seo
+@using Nop.Services.Security
+@using Nop.Web.Framework.Events
+@using Nop.Core
+@using Nop.Core.Events
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Index";
+}
+@model Nop.Web.Models.Quote.MessengerModel
+@inject IWorkContext workContext;
+@inject Nop.Services.Common.IGenericAttributeService _genericAttributeService;
+@inject Nop.Services.Localization.ILanguageService languageService
+@{
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.countryselect.js");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.ajaxcart.js");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.common.js");
+    //when jQuery migrate script logging is active you will see the log in the browser console
+
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-migrate/jquery-migrate.min.js");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-ui-dist/jquery-ui.min.js");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-validation/jquery.validate.min.js");
+    Html.AppendScriptParts(ResourceLocation.Head, "~/lib_npm/jquery/jquery.min.js");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/bootstrap/js/bootstrap.min.js");
+    Html.AddCssFileParts(ResourceLocation.Footer, "~/lib_npm/bootstrap/css/bootstrap.min.css");
+    Html.AddCssFileParts(ResourceLocation.Footer, "~/lib_npm/@fortawesome/fontawesome-free/css/all.min.css");
+    var customer = await workContext.GetCurrentCustomerAsync();
+    string firstName = await _genericAttributeService.GetAttributeAsync<string>(customer, Nop.Core.Domain.Customers.NopCustomerDefaults.FirstNameAttribute);
+    string lastName = await _genericAttributeService.GetAttributeAsync<string>(customer, Nop.Core.Domain.Customers.NopCustomerDefaults.LastNameAttribute);
+    string company = await _genericAttributeService.GetAttributeAsync<string>(customer, Nop.Core.Domain.Customers.NopCustomerDefaults.CompanyAttribute);
+    string initals = firstName.First() + "" + lastName.First();
+
+    var _quoteId = Model.VendorId == 0 ? Model.QuoteId : Model.VendorQuoteId;
+    var _sourceTypeId = Model.CustomerId == 0 ? 3 : 1;
+    var _userId = customer.Id;
+    var seletedUserId = Model.CustomerId == 0 ? Model.VendorId : Model.CustomerId;
+    bool _customerFlag = Model.CustomerId == 0 ? false : true; // true if customer, else is vendor
+    var _vendorFlag = Model.VendorId == 0 ? 0 : 1;
+}
+
+<!DOCTYPE html>
+<html lang="@languageService.GetTwoLetterIsoLanguageName(await workContext.GetWorkingLanguageAsync())" @(await this.ShouldUseRtlThemeAsync() ? Html.Raw(" dir=\"rtl\"") : null) @Html.NopPageCssClasses()>
+<head>
+    <title>@Html.NopTitle()</title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+    <meta name="description" content="@(Html.NopMetaDescription())" />
+    <meta name="keywords" content="@(Html.NopMetaKeywords())" />
+    <meta name="generator" content="nopCommerce" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    @Html.NopHeadCustom()
+    @*This is used so that themes can inject content into the header*@
+    @await Html.PartialAsync("Head")
+    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeadHtmlTag })
+    @Html.NopCssFiles(ResourceLocation.Head)
+    @Html.NopScripts(ResourceLocation.Head)
+    @Html.NopCanonicalUrls()
+    @await Component.InvokeAsync("NewsRssHeaderLink")
+    @await Component.InvokeAsync("BlogRssHeaderLink")
+    @*Insert favicon and app icons head code*@
+    @await Component.InvokeAsync("Favicon")
+
+    @Html.NopInlineScripts(ResourceLocation.Head)
+    <!--Powered by nopCommerce - https://www.nopCommerce.com-->
+</head>
+<body>
+    <div class="zoomed">
+        <div class="row p-3">
+            @await Component.InvokeAsync("ChatHeaderAdmin", new { UserName = firstName + " " + lastName,
+           CompanyName = company,
+           Initials = initals,
+           IsAdmin = Model.IsAdmin,
+           QuoteGuid = Model.Guid,
+           QuoteId = Model.CustomQuoteId,
+           QuoteDate = Model.QuoteDate,
+           CustomerQuoteGuid = Model.CustomerQuoteGuid,
+           CustomerFlag = _customerFlag })
+        </div>
+        <div class="row p-3">
+            <div class="col-3">
+                @await Component.InvokeAsync("ChatListerAdmin", new { UserName = firstName + " " + lastName, CompanyName = company, 
+               Initials = initals, QuoteId = _quoteId, customerFlag = _customerFlag, IsAdmin = Model.IsAdmin,
+               QuoteDate = Model.QuoteDate, UserId = seletedUserId,
+               QuoteGuid = Model.Guid,
+               CustomerQuoteGuid = Model.CustomerQuoteGuid
+           })
+            </div>
+            <div class="col-6">
+                <div id="ChatCartDetails">
+                    @await Component.InvokeAsync("ChatCartDetailsAdmin", new { QuoteId = Model.QuoteId, customerFlag = _customerFlag, IsAdmin = Model.IsAdmin })
+                </div>
+                <div id="ChatProductDetails" style="display:none">
+                    @await Component.InvokeAsync("ChatProductDetailsAdmin", new { QuoteGuid = Model.CustomerQuoteGuid, CustomerFlag = _customerFlag })
+                </div>
+                <div class="pt-3" id="ChatBox">
+                    @await Component.InvokeAsync("ChatBoxAdmin", new { UserId = _userId, VendorId = Model.VendorId, ChatId = _quoteId, isCustomer = _customerFlag })
+                </div>
+                <div id="ForwardSelectionList" style="display:none">
+                    @await Component.InvokeAsync("ForwardSelectionListAdmin", new { customerQuoteId = _quoteId, isCustomer = _customerFlag })
+                </div>
+                <div id="FileUpload" style="display:none">
+                    @await Component.InvokeAsync("FileUploadAdmin", new { extensions = "pdf,jpg,jpeg,png,doc,docx,xlsx,xls,zip", sourceTypeId = _sourceTypeId, sourceId = _quoteId })
+                </div>
+
+            </div>
+
+            <div class="col-3">
+                @*<div class="row">
+                        <div class="col-md-3">
+                            @await Component.InvokeAsync("FileUpload", new { extensions = "pdf,jpg", sourceTypeId = 1, sourceId = Model.QuoteId })
+                        </div>
+                        <div class="col-md-8 mt-10 p-3">
+                            <h5> File Share / Upload </h5>
+                            <div class="h6"> Drag File here or browse</div>
+                        </div>
+                    </div>*@
+
+                <div class="row">
+                    <a href="javascript:void(0);" onclick="showuploader()" id="showuploaderbutton">
+                        <div class="col-md-4">
+                            <i class=" attachment-icon fa fa-paperclip fa-2x"></i>
+                        </div>
+                    </a>
+                    <a href="javascript:void(0);" onclick="hideuploader()" style="display:none" id="hideuploaderbutton">
+                        <div class="col-md-4">
+                            <i class=" attachment-icon fa fa-paperclip fa-2x"></i>
+                        </div>
+                    </a>
+                    <div class="col-md-8 mt-10 p-3">
+                        <h5> File Share / Upload </h5>
+                    </div>
+
+                </div>
+
+                <div class="row" style="height:700px; overflow-y:scroll">
+                    @await Component.InvokeAsync("FileListerAdmin", new { sourceTypeId = _sourceTypeId, sourceId = _quoteId, IsAdmin = Model.IsAdmin })
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    @Html.NopCssFiles(ResourceLocation.Footer)
+    @Html.NopScripts(ResourceLocation.Footer)
+    @Html.NopInlineScripts(ResourceLocation.Footer)
+</body>
+</html>
+
+<script>
+        function ShowChat() {
+            $('#ChatCartDetails').show();
+            $('#ChatBox').show();
+        }
+
+        function HideChat() {
+            $('#ChatCartDetails').hide();
+            $('#ChatBox').hide();
+        }
+
+        function showForwardList() {
+            HideChat();
+            $('#FileUpload').hide();
+            $('#ForwardSelectionList').show();
+        }
+
+        function hideForwardList() {
+            ShowChat();
+            $('#ForwardSelectionList').hide();
+        }
+
+        function showuploader() {
+            HideChat();
+            $('#FileUpload').show();
+            $('#ForwardSelectionList').hide();
+            $('#hideuploaderbutton').show();
+            $('#showuploaderbutton').hide();
+
+        }
+        function hideuploader() {
+            ShowChat();
+            $('#FileUpload').hide();
+            $('#hideuploaderbutton').hide();
+            $('#showuploaderbutton').show();
+        }
+
+    function hideshowCheckBox(type) {
+            if (type == "file") {
+                $('.cb-file').toggle();
+            }
+            else {
+                $('.cb-chat').toggle();
+
+            }
+        }
+
+    @*function ProductClick() {
+            debugger;
+
+            var _url = '@Url.Action("Products", "Home")';
+                $.ajax({
+                    type: "GET",
+                    url: _url,
+                    success: function (result) {
+                        $('#ChatCartDetails').hide();
+                        $('#ChatBox').hide();
+                        $('#ChatProductDetails').show();
+                    },
+                });
+
+        }*@
+
+    function ProductClick() {
+        $('#ChatCartDetails').hide();
+        $('#ChatBox').hide();
+        $('#ChatProductDetails').show();
+    }
+
+    function ProductClose() {
+        $('#ChatCartDetails').show();
+        $('#ChatBox').show();
+        $('#ChatProductDetails').hide();
+    }
+
+</script>

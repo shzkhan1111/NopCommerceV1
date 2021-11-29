@@ -1,0 +1,88 @@
+﻿@using Nop.Web.Factories
+
+@model ForwardSelectionListModel
+@inject IVendorModelFactory _vendorFactory
+@inject ICustomerModelFactory _customerFactory
+
+@{   
+
+    if (!Model.IsCustomer)
+        Model.ForwardDetailsList =await _customerFactory.PrepareCustomerListByCustomerQuoteAsync(Model.CustomerQouteId);
+    else
+        Model.ForwardDetailsList = await _vendorFactory.PrepareVendorListByCustomerQuoteAsync(Model.CustomerQouteId);
+}
+<div class="container-box">
+    <div class="container-title bb pr-3 pl-5 pt-2 pb-2">
+        <div class="row">
+            <span>   @( Model.IsCustomer == true ? "Vendor's List" : "Customer's List" )</span><br>
+        </div>
+    </div>
+    <div class="container-box-area pt-2 pb-2">
+        <div class="row">
+            <div id="checkboxes" class="pl-5 pt-2">
+                <ul>
+
+                    @foreach (var obj in Model.ForwardDetailsList)
+                    {
+                        if (Model.ForwardDetailsList.Count == 1)
+                        {
+                            <li class="pb-2" style="font-weight: bold;"><input type="checkbox" name="cbFwdSelection" value="@obj.Id" checked style="width:20px;height:20px;margin-right:10px;"> @obj.Name </li>
+                        }
+                        else
+                        {
+                            <li class="pb-2" style="font-weight: bold;"><input type="checkbox" name="cbFwdSelection" value="@obj.Id" style="width:20px;height:20px;margin-right:10px;"> @obj.Name </li>
+                        }
+                    }
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row pt-4 pr-3 pl-3 pb-4">
+        <div class="col-8"></div>
+        <div class="col-4 align-text-right">
+            <button class="my-cancel-button" onclick="hideForwardList()"> CLOSE</button>
+            <button class="my-success-button" onclick="SendFiles('@Model.IsCustomer','@Model.CustomerQouteId')"> SEND</button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    var downloadFileIds = [];
+    var fwdSelectionIds = [];
+
+    function SendFiles(isCustomer, customerQuoteId) {
+        downloadFileIds = [];
+        fwdSelectionIds = [];
+
+        $("input:checkbox[name=cbFileList]:checked").each(function () {
+            downloadFileIds.push($(this).val());
+        });
+
+        $("input:checkbox[name=cbFwdSelection]:checked").each(function () {
+            fwdSelectionIds.push($(this).val());
+        });
+
+        var serverUrl = '@Url.Action("SendFilesToVendors", "RequestQuote")';
+        if (isCustomer != 'True') {
+            serverUrl = '@Url.Action("SendFilesToCustomers", "RequestQuote")';
+        }
+
+        $.ajax({
+            url: serverUrl,
+            type: "POST",
+            data: { fileIds: downloadFileIds, targetIds: fwdSelectionIds, quoteId: customerQuoteId },
+            success: function (response) {
+                if (response.success) {
+                    hideForwardList();
+                }
+                else {
+                    //displayPopupNotification(response.message, 'error', 3000);
+                }
+            }
+        });
+
+
+    }
+</script>

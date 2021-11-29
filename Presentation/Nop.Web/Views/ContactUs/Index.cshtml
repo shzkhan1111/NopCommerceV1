@@ -1,0 +1,59 @@
+﻿@using Nop.Core.Configuration
+@using Nop.Core.Domain.Common
+@using Nop.Core.Domain.Seo
+@using Nop.Services.Security
+@using Nop.Web.Framework.Events
+@using Nop.Core
+@using Nop.Core.Events
+
+@model Nop.Web.Models.Quote.MessengerModel
+@inject IWorkContext workContext;
+@inject Nop.Services.Common.IGenericAttributeService _genericAttributeService;
+@inject Nop.Services.Localization.ILanguageService languageService
+@{
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.countryselect.js");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.ajaxcart.js");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/js/public.common.js");
+    //when jQuery migrate script logging is active you will see the log in the browser console
+
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-migrate/jquery-migrate.min.js");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-ui-dist/jquery-ui.min.js");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/jquery-validation/jquery.validate.min.js");
+    Html.AppendScriptParts(ResourceLocation.Head, "~/lib_npm/jquery/jquery.min.js");
+    Html.AppendScriptParts(ResourceLocation.Footer, "~/lib_npm/bootstrap/js/bootstrap.min.js");
+    Html.AddCssFileParts(ResourceLocation.Footer, "~/lib_npm/bootstrap/css/bootstrap.min.css");
+    Html.AddCssFileParts(ResourceLocation.Footer, "~/lib_npm/@fortawesome/fontawesome-free/css/all.min.css");
+    var customer = await workContext.GetCurrentCustomerAsync();
+    string firstName = await _genericAttributeService.GetAttributeAsync<string>(customer, Nop.Core.Domain.Customers.NopCustomerDefaults.FirstNameAttribute);
+    string lastName = await _genericAttributeService.GetAttributeAsync<string>(customer, Nop.Core.Domain.Customers.NopCustomerDefaults.LastNameAttribute);
+    string company = await _genericAttributeService.GetAttributeAsync<string>(customer, Nop.Core.Domain.Customers.NopCustomerDefaults.CompanyAttribute);
+    string initals = firstName.First() + "" + lastName.First();
+
+    var _quoteId = Model.VendorId == 0 ? Model.QuoteId : Model.VendorQuoteId;
+    var _sourceTypeId = Model.CustomerId == 0 ? 3 : 1;
+    var _userId = customer.Id;
+    var seletedUserId = Model.CustomerId == 0 ? Model.VendorId : Model.CustomerId;
+    bool _customerFlag = Model.CustomerId == 0 ? false : true; // true if customer, else is vendor
+    var _vendorFlag = Model.VendorId == 0 ? 0 : 1;
+}
+@{
+    Layout = "_ColumnsTwo";
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-account-page");
+    Html.AppendPageCssClassParts("html-order-list-page");
+}
+@section left
+{
+}
+<div class="page account-page order-list-page">
+    <div class="page-title">
+        <h1>Contact Us</h1>
+    </div>
+</div>
+@Html.NopCssFiles(ResourceLocation.Footer)
+@Html.NopScripts(ResourceLocation.Footer)
+@Html.NopInlineScripts(ResourceLocation.Footer)
+
