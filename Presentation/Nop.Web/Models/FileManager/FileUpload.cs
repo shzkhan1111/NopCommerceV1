@@ -21,6 +21,8 @@ namespace Nop.Web.Models.Common
         public Nullable<int> SourceId { get; set; }
         public Nullable<int> SourceTypeId { get; set; }
         public List<string> AllowedFileExtensions { get; set; }
+        public string ControllerName { get; set; }
+        public string ActionName { get; set; }
 
 
     }

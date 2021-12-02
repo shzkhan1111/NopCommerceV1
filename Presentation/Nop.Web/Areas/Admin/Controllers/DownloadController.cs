@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -239,6 +240,171 @@ namespace Nop.Web.Areas.Admin.Controllers
                 downloadId = download.Id
             });
         }
+
+        [HttpPost]
+        [IgnoreAntiforgeryToken]
+        public virtual async Task<IActionResult> UploadProductImageFile(string sourceParams)
+        {
+
+            var sourceParameters = "0";//sourceParams.Split(',').Select(Int32.Parse).ToList();
+            int sourceId = 0;// sourceParameters[0]; //First paramter in string will be SourceId
+            int sourceTypeId = 0;// sourceParameters[1]; //Second paramter in string will be SourceTypeId
+            int authorId = 0;//sourceParameters[2]; //Thord paramter in string will be AuthorId
+
+            var httpPostedFile = Request.Form.Files.FirstOrDefault();
+            if (httpPostedFile == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "No file uploaded",
+                    downloadGuid = Guid.Empty
+                });
+            }
+
+            var fileBinary = await _downloadService.GetDownloadBitsAsync(httpPostedFile);
+
+            var qqFileNameParameter = "qqfilename";
+            var fileName = httpPostedFile.FileName;
+            if (string.IsNullOrEmpty(fileName) && Request.Form.ContainsKey(qqFileNameParameter))
+                fileName = Request.Form[qqFileNameParameter].ToString();
+            //remove path (passed in IE)
+            fileName = _fileProvider.GetFileName(fileName);
+            string nameOfFile = fileName;
+            var contentType = httpPostedFile.ContentType;
+
+            var fileExtension = _fileProvider.GetFileExtension(fileName);
+            if (!string.IsNullOrEmpty(fileExtension))
+                fileExtension = fileExtension.ToLowerInvariant();
+
+            fileName = GetUniqueFileName(fileName, sourceId, fileExtension);
+
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            string firstName = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.FirstNameAttribute);
+            string lastName = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.LastNameAttribute);
+
+            string currentDir = System.IO.Directory.GetCurrentDirectory();
+            string filesToUpload = currentDir + "/wwwroot/images/ProductImages/";
+            //string 
+            using (var fileStream = new FileStream(Path.Combine(filesToUpload, nameOfFile), FileMode.Create))
+            {
+                await httpPostedFile.CopyToAsync(fileStream);
+            }
+
+
+            var download = new Download
+            {
+                DownloadGuid = Guid.NewGuid(),
+                UseDownloadUrl = false,
+                DownloadUrl = string.Empty,
+                DownloadBinary = fileBinary,//get binary file and save it in the folder
+                ContentType = contentType,
+                //we store filename without extension for downloads
+                Filename = _fileProvider.GetFileNameWithoutExtension(fileName),
+                Extension = fileExtension,
+                IsNew = true,
+                SourceId = sourceId,
+                SourceTypeId = sourceTypeId,
+                AuthorId = authorId,
+                CreatedOn = DateTime.Now,
+                CreatedBy = firstName + "," + lastName
+            };
+            await _downloadService.InsertDownloadAsync(download);
+
+            //when returning JSON the mime-type must be set to text/plain
+            //otherwise some browsers will pop-up a "Save As" dialog.
+            return Json(new
+            {
+                success = true,
+                message = await _localizationService.GetResourceAsync("Download.UploadFile"),
+                downloadUrl = Url.Action("GetFileUpload", "Download", new { downloadId = download.DownloadGuid }),
+                downloadGuid = download.DownloadGuid,
+                downloadId = download.Id
+            });
+        }
+
+        [HttpPost]
+        [IgnoreAntiforgeryToken]
+        public virtual async Task<IActionResult> UploadSliderFile(string sourceParams)
+        {
+
+            var sourceParameters = "0";//sourceParams.Split(',').Select(Int32.Parse).ToList();
+            int sourceId = 0;// sourceParameters[0]; //First paramter in string will be SourceId
+            int sourceTypeId = 0;// sourceParameters[1]; //Second paramter in string will be SourceTypeId
+            int authorId = 0;//sourceParameters[2]; //Thord paramter in string will be AuthorId
+
+            var httpPostedFile = Request.Form.Files.FirstOrDefault();
+            if (httpPostedFile == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "No file uploaded",
+                    downloadGuid = Guid.Empty
+                });
+            }
+
+            var fileBinary = await _downloadService.GetDownloadBitsAsync(httpPostedFile);
+
+            var qqFileNameParameter = "qqfilename";
+            var fileName = httpPostedFile.FileName;
+            if (string.IsNullOrEmpty(fileName) && Request.Form.ContainsKey(qqFileNameParameter))
+                fileName = Request.Form[qqFileNameParameter].ToString();
+            //remove path (passed in IE)
+            fileName = _fileProvider.GetFileName(fileName);
+            string nameOfFile = fileName;
+            var contentType = httpPostedFile.ContentType;
+
+            var fileExtension = _fileProvider.GetFileExtension(fileName);
+            if (!string.IsNullOrEmpty(fileExtension))
+                fileExtension = fileExtension.ToLowerInvariant();
+
+            fileName = GetUniqueFileName(fileName, sourceId, fileExtension);
+
+            var customer = await _workContext.GetCurrentCustomerAsync();
+            string firstName = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.FirstNameAttribute);
+            string lastName = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.LastNameAttribute);
+
+            string currentDir = System.IO.Directory.GetCurrentDirectory();
+            string filesToUpload = currentDir + "/wwwroot/images/slider/";
+            //string 
+            using (var fileStream = new FileStream(Path.Combine(filesToUpload, nameOfFile), FileMode.Create))
+            {
+                await httpPostedFile.CopyToAsync(fileStream);
+            }
+
+
+            var download = new Download
+            {
+                DownloadGuid = Guid.NewGuid(),
+                UseDownloadUrl = false,
+                DownloadUrl = string.Empty,
+                DownloadBinary = fileBinary,//get binary file and save it in the folder
+                ContentType = contentType,
+                //we store filename without extension for downloads
+                Filename = _fileProvider.GetFileNameWithoutExtension(fileName),
+                Extension = fileExtension,
+                IsNew = true,
+                SourceId = sourceId,
+                SourceTypeId = sourceTypeId,
+                AuthorId = authorId,
+                CreatedOn = DateTime.Now,
+                CreatedBy = firstName + "," + lastName
+            };
+            await _downloadService.InsertDownloadAsync(download);
+
+            //when returning JSON the mime-type must be set to text/plain
+            //otherwise some browsers will pop-up a "Save As" dialog.
+            return Json(new
+            {
+                success = true,
+                message = await _localizationService.GetResourceAsync("Download.UploadFile"),
+                downloadUrl = Url.Action("GetFileUpload", "Download", new { downloadId = download.DownloadGuid }),
+                downloadGuid = download.DownloadGuid,
+                downloadId = download.Id
+            });
+        }
+
 
         public string GetUniqueFileName(string fileName, int sourceId, string fileExtension)
         {

@@ -1,0 +1,142 @@
+﻿@using Nop.Web.Areas.Admin.Models.Picture;
+
+@model PictureListModel
+@*@model SliderModel*@
+@*For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860*@
+
+@{ }
+
+<script>
+
+    function deleteItem(Name) {
+        debugger
+            console.log(Name);
+            var serverUrl = '@Url.Action("DeletePicture", "ProductImage")';
+            $.ajax({
+                url: serverUrl,
+                type: "GET",
+                data: { name: Name },
+                success: function (response) {
+
+                    location.reload(true);
+                    if (response.success) {
+
+                    }
+                    else {
+
+                    }
+                }
+            });
+
+        }
+    $(document).ready(function () {
+
+
+    $('#addProductPicture').click(function () {
+        debugger;
+        // Checking whether FormData is available in browser
+        if (window.FormData !== undefined) {
+
+            debugger;
+            var fileUpload = $("#files").get(0);
+            var files = fileUpload.files;
+
+            // Create FormData object
+            var fileData = new FormData();
+
+            // Looping over all files and add it to FormData object
+            for (var i = 0; i < files.length; i++) {
+                fileData.append(files[i].name, files[i]);
+            }
+            console.log(fileData)
+
+
+
+            $.ajax({
+                url: '/Slider/UploadMultiple',
+                type: "POST",
+                contentType: "application/x-www-form-urlencoded", // Not to set any content header
+               /* processData: false, // Not to process data  */
+                data: fileData,
+                success: function (result) {
+                    alert(result);
+                },
+                error: function (err) {
+                    alert(err.statusText);
+                }
+            });
+        } else {
+            alert("FormData is not supported.");
+        }
+    });
+
+
+});
+
+
+
+</script>
+
+<nop-card>
+    
+
+    <div class="card card-secondary card-outline" data-card-name="product-pictures" data-hideattribute="ProductPage.HidePicturesBlock"
+         id=product-pictures>
+        <div class="card-header with-border clearfix">
+            <div class="card-title"><i class="far fa-images"></i>Product Images</div>
+            <div class="card-tools float-right">
+                <button class="btn btn-tool" data-card-widget="collapse" type="button"><i class="fa-minus toggle-icon fa"></i></button>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            @await Component.InvokeAsync("SliderUpload", new { extensions = "svg,jpg,jpeg,png", controllerName = "Download", actionName = "UploadProductImageFile" })
+        </div>
+
+        <div class="card-body">
+            <div id="sliderpictures-grid_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="dataTables_scroll">
+                            <div class="dataTables_scrollHead" style="overflow: hidden; position: relative; border: 0px; width: 100%;">
+                                <div class="dataTables_scrollHeadInner" style="box-sizing: content-box;  padding-right: 0px;">
+                                    <table class="table table-bordered table-hover table-striped dataTable no-footer" width="100%" role="grid"
+                                           style="margin-left: 0px; ">
+
+                                        <thead>
+                                            <tr role="row" style="height: 0px;">
+                                                <th class="sorting_disabled" rowspan="1" colspan="1">Picture</th>
+                                                <th class="sorting_disabled button-column" rowspan="1" colspan="1">Delete</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            @if (Model != null && Model.pictureModels != null && Model.pictureModels.Count > 0)
+                                            {
+                                @foreach (var item in Model.pictureModels)
+                                {
+                <tr>
+                    <td><img alt="@item.PictureName" src="@item.PictureUrl" width="170" /></td>
+                    <td class=" button-column">
+                        <a href="#" id="DeleteImage" onclick="deleteItem('@item.PictureName')" class="btn btn-default"><i class="far fa-trash-alt"></i> Delete</a>
+                    </td>
+
+
+                </tr>
+}}
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @*<div class="form-group row">
+                @await Component.InvokeAsync("SliderUpload", new { extensions = "svg,jpg,jpeg,png", controllerName = "Download", actionName = "UploadSliderFile" })
+            </div>*@
+        </div>
+    </div>
+</nop-card>

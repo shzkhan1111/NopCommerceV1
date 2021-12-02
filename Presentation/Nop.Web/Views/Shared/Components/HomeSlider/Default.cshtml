@@ -4,6 +4,13 @@
         Html.AddCssFileParts(ResourceLocation.Footer, "~/lib_npm/@fortawesome/fontawesome-free/css/all.min.css");
         Html.AppendCssFileParts(ResourceLocation.Footer, "~/Themes/Pavilion/Content/css/slider/style.css");
     }*@
+@using Nop.Web.Areas.Admin.Models.SliderFolder;
+
+
+@model SliderListModel
+@{
+    int c = 0;
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -26,42 +33,69 @@
             <div class="colLeft">
                 <div id="carouselExampleControls" class="carousel slide h-100 pb-3 pr-3" data-ride="carousel">
                     <div class="carousel-inner h-100">
-                        <div class="carousel-item active h-100">
-                            <img class="d-block w-100 h-100" src="~/images/slider/image1.jpg"
-                                 alt="First slide">
-                        </div>
-                        <div class="carousel-item h-100">
-                            <img class="d-block w-100 h-100" src="~/images/slider/image2.jpg"
-                                 alt="Second slide">
-                        </div>
-                        <div class="carousel-item h-100">
-                            <img class="d-block w-100 h-100" src="~/images/slider/image3.jpg"
-                                 alt="Second slide">
-                        </div>
                         @*<div class="carousel-item active h-100">
-                            <img class="d-block w-100 h-100" src="~/images/slider/Mining-Equipment.jpg"
-                                 alt="First slide">
-                        </div>
-                        <div class="carousel-item h-100">
-                            <img class="d-block w-100 h-100" src="~/images/slider/oil and gas July 2021.png"
-                                 alt="Second slide">
-                        </div>*@
-                        <div class="carousel-item h-100">
-                            <img class="d-block w-100 h-100" src="~/images/slider/image4.jpg"
-                                 alt="Second slide">
-                        </div>
+            <img class="d-block w-100 h-100" src="~/images/slider/image1.jpg"
+                 alt="First slide">
+        </div>*@
+
+                        @foreach (var item in Model.sliderModels)
+                        {
+
+
+                            @if (c == 0)
+                            {
+                            <div class="carousel-item active h-100">
+                                <img class="d-block w-100 h-100" src="@item.PictureUrl"
+                                     alt="First slide">
+                            </div>
+                            
+                            }
+                            else
+                            {
+                                <div class="carousel-item  h-100">
+                                    <img class="d-block w-100 h-100"  src="@item.PictureUrl"
+                                         alt="First slide">
+                                </div>
+                            }
+                            c++;
+                                    @*<div class="carousel-item h-100">
+                                        <img class="d-block w-100 h-100" src="@item.PictureUrl"
+                                             alt="First slide">
+                                    </div>*@
+                            }
+
+                        <!--<div class="carousel-item h-100">
+        <img class="d-block w-100 h-100" src="~/images/slider/image2.jpg"
+             alt="Second slide">
+    </div>
+    <div class="carousel-item h-100">
+        <img class="d-block w-100 h-100" src="~/images/slider/image3.jpg"
+             alt="Second slide">
+    </div>-->
                         @*<div class="carousel-item active h-100">
-                            <img class="d-block w-100 h-100" src="~/images/slider/Oil-and-Gas-2.jpg"
-                                 alt="First slide">
-                        </div>*@
-                        <div class="carousel-item h-100">
-                            <img class="d-block w-100 h-100" src="~/images/slider/image5.jpg"
-                                 alt="Second slide">
-                        </div>
-                        <div class="carousel-item h-100">
-                            <img class="d-block w-100 h-100" src="~/images/slider/image6.jpg"
-                                 alt="Second slide">
-                        </div>
+            <img class="d-block w-100 h-100" src="~/images/slider/Mining-Equipment.jpg"
+                 alt="First slide">
+        </div>
+        <div class="carousel-item h-100">
+            <img class="d-block w-100 h-100" src="~/images/slider/oil and gas July 2021.png"
+                 alt="Second slide">
+        </div>*@
+                        <!--<div class="carousel-item h-100">
+        <img class="d-block w-100 h-100" src="~/images/slider/image4.jpg"
+             alt="Second slide">
+    </div>-->
+                        @*<div class="carousel-item active h-100">
+            <img class="d-block w-100 h-100" src="~/images/slider/Oil-and-Gas-2.jpg"
+                 alt="First slide">
+        </div>*@
+                        <!--<div class="carousel-item h-100">
+        <img class="d-block w-100 h-100" src="~/images/slider/image5.jpg"
+             alt="Second slide">
+    </div>
+    <div class="carousel-item h-100">
+        <img class="d-block w-100 h-100" src="~/images/slider/image6.jpg"
+             alt="Second slide">
+    </div>-->
                         <a class="carousel-control-prev h-100" href="#carouselExampleControls" role="button"
                            data-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -78,26 +112,26 @@
             <div class="colRight">
                 <div class="h-50 position-relative pb-3">
 
-                    <img class="h-100 w-100 " src="~/images/slider/oil and gas.jpg" alt="">
+                    <img class="h-100 w-100 " src="~/images/homescreen/oil and gas.png" alt="">
                     <a class="imgLabel bottom-left" href="@T("Category.OilGas")">Oil & Gas</a>
                 </div>
                 <div class="h-50 position-relative pb-3">
-                    <img class="h-100 w-100 " src="~/images/slider/heavy equipment.jpg" alt="">
+                    <img class="h-100 w-100 " src="~/images/homescreen/heavy equipment.jfif" alt="">
                     <a class="imgLabel bottom-left" href="@T("Category.HeavyEquipment")">Heavy Equipment</a>
                 </div>
             </div>
         </div>
         <div class="d-flex bottomRow">
             <div class="position-relative imgHolder pr-3">
-                <img class="w-100 h-100 " src="~/images/slider/transport.png" alt="">
+                <img class="w-100 h-100 " src="~/images/homescreen/Transport.jpg" alt="">
                 <a class="imgLabel bottom-right" href="@T("Category.TRANSPORT")">TRANSPORT</a>
             </div>
             <div class="position-relative imgHolder pr-3">
-                <img class="w-100 h-100 " src="~/images/slider/renewables.png" alt="">
+                <img class="w-100 h-100 " src="~/images/homescreen/renewables.png" alt="">
                 <a class="imgLabel bottom-left" href="@T("Category.RENEWABLES")">RENEWABLES</a>
             </div>
             <div class="position-relative imgHolder">
-                <img class="w-100 h-100 " src="~/images/slider/mining.png" alt="">
+                <img class="w-100 h-100 " src="~/images/homescreen/mining.png" alt="">
                 <a class="imgLabel bottom-left" href="@T("Category.MINING")">MINING</a>
             </div>
         </div>
