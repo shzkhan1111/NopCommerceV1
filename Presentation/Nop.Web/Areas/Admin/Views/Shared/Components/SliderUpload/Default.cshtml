@@ -75,7 +75,7 @@
                           new {sourceParams = Model.SourceId.ToString() + "," + @Model.SourceTypeId.ToString() + "," + @Model.UserId.ToString() })'
             },
             template: "@(controlId)-qq-template",
-            multiple: false,
+            multiple: true,
             validation: {
                 allowedExtensions: [@Html.Raw(allowedFileExtensions)]
             }
